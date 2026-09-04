@@ -1,0 +1,296 @@
+{
+  "eng": {
+    "meta": {
+      "name": "English",
+      "nativeName": "English",
+      "flag": "🇬🇧"
+    },
+    "app": {
+      "brand": {
+        "eyebrow": "Beetle Club Macedonia",
+        "heading": ""
+      },
+      "header": {
+        "nextMeet": "Next meet:",
+        "upcomingEventInfo": "Upcoming club event info",
+        "goToHome": "Go to home page",
+        "languageSelector": "Language selector",
+        "switchToMkd": "Switch to Macedonian",
+        "switchToEng": "Switch to English"
+      },
+      "nav": {
+        "home": "Home",
+        "heritage": "Heritage",
+        "news": "Articles",
+        "events": "Events",
+        "gallery": "Gallery"
+      },
+      "footer": {
+        "contact": "Contact",
+        "email": "Email",
+        "quickLinks": "Quick links",
+        "copyright": "© 2026 Beetle Club Macedonia 🇲🇰"
+      }
+    },
+    "components": {
+      "beetleModel": {
+        "title": "Passion, heritage and community in one motion",
+        "alt": "The Beetle in Motion"
+      },
+      "photoShowcase": {
+        "fallbackTitle": "Image unavailable",
+        "fallbackSubtitle": "Refresh page",
+        "modalClose": "Close photo"
+      }
+    },
+    "pages": {
+      "events": {
+        "eyebrow": "Upcoming events",
+        "title": "Club calendar",
+        "nextUp": "Next up",
+        "viewDetails": "View details",
+        "eventDetails": "Event details",
+        "dateLabel": "Date",
+        "locationLabel": "Location",
+        "backToEvents": "Back to events"
+      },
+      "gallery": {
+        "eyebrow": "Gallery",
+        "title": "Club albums",
+        "prev": "Previous photo",
+        "next": "Next photo"
+      },
+      "heritage": {
+        "eyebrow": "Our Heritage",
+        "title": "Preserving the legacy of the Beetle",
+        "paragraphOne": "Beetle Club Macedonia was founded by a group of passionate Volkswagen Beetle enthusiasts with a shared vision—to preserve one of the world's most iconic automobiles and bring together a community that values its history, engineering, and timeless character. Since its beginnings, the club has grown into a meeting place for owners, collectors, and admirers who believe the Beetle is more than just a car; it is a symbol of freedom, simplicity, and generations of unforgettable memories.",
+        "paragraphTwo": "Through gatherings, scenic drives, exhibitions, and community events across Macedonia, the club celebrates the enduring legacy of the Volkswagen Beetle while inspiring new generations to appreciate classic automotive culture. Every restored vehicle, every shared story, and every kilometre driven reflects our commitment to preserving this remarkable heritage for the future."
+      },
+      "news": {
+        "eyebrow": "Latest News",
+        "title": "News from the club",
+        "articles": [
+          {
+            "title": "Weekend meet announced",
+            "body": "Join us for a relaxed gathering at the weekend meet with coffee, stories, and classic Beetles."
+          },
+          {
+            "title": "Restoration project spotlight",
+            "body": "A new member restoration project is underway, sharing progress and inspiration with the community."
+          },
+          {
+            "title": "Club announcement",
+            "body": "We are preparing a special exhibition event for the next season and will share full details soon."
+          }
+        ]
+      }
+    },
+    "home": {
+      "hero": {
+        "title": "About us",
+        "body": "Buba Club Macedonia is a community of classic Volkswagen enthusiasts dedicated to preserving the legacy of the iconic Volkswagen Beetle and other vintage VW models. Through gatherings, exhibitions, road trips, and restoration projects, we bring together people who share a passion for automotive history, craftsmanship, and timeless design. Whether you are a long-time collector, a proud Beetle owner, or simply an admirer of classic automobiles, our club offers a place to connect, learn, and celebrate the enduring spirit of the Volkswagen community."
+      },
+      "gallery": {
+        "button": "View Gallery"
+      },
+      "heritage": {
+        "title": "Heritage",
+        "body": "Beetle Club Macedonia is dedicated to preserving the history, heritage, and spirit of the iconic Volkswagen Beetle. United by a shared passion for classic automobiles, our members celebrate the timeless design, craftsmanship, and community that have made the Beetle a beloved symbol across generations.",
+        "cta": "Want to learn more? Visit our Heritage page to discover the history of Beetle Club Macedonia, our journey, memorable milestones, and the legacy we continue to build together."
+      },
+      "cards": {
+        "member": {
+          "eyebrow": "Become a Member",
+          "title": "Join the Beetle community",
+          "description": "Become part of a welcoming circle of enthusiasts who share stories, restore classics, and celebrate every Beetle journey together.",
+          "button": "Join Beetle Club Macedonia"
+        },
+        "news": {
+          "eyebrow": "Latest News",
+          "title": "What’s happening now",
+          "items": [
+            "Recent events and weekend meetups",
+            "Club announcements and community updates",
+            "Restoration projects and classic builds"
+          ]
+        }
+      },
+      "partners": {
+        "eyebrow": "Our Partners",
+        "title": "Trusted partners of the club",
+        "items": [
+          "Partner One",
+          "Partner Two",
+          "Partner Three",
+          "Partner Four"
+        ]
+      },
+      "socials": {
+        "title": "Follow Us",
+        "items": [
+          "Instagram",
+          "Facebook",
+          "YouTube"
+        ]
+      },
+      "joinModal": {
+        "eyebrow": "Membership request",
+        "title": "Join Beetle Club Macedonia",
+        "name": "Name",
+        "surname": "Surname",
+        "email": "Email",
+        "description": "Description",
+        "close": "Close join form",
+        "cancel": "Cancel",
+        "submit": "Send request"
+      }
+    }
+  },
+  "mkd": {
+    "meta": {
+      "name": "Macedonian",
+      "nativeName": "Македонски",
+      "flag": "🇲🇰"
+    },
+    "app": {
+      "brand": {
+        "eyebrow": "Буба Клуб Македонија",
+        "heading": ""
+      },
+      "header": {
+        "nextMeet": "Следен собир:",
+        "upcomingEventInfo": "Информација за следниот настан на клубот",
+        "goToHome": "Оди на почетна",
+        "languageSelector": "Избор на јазик",
+        "switchToMkd": "Префрли на македонски",
+        "switchToEng": "Префрли на англиски"
+      },
+      "nav": {
+        "home": "Дома",
+        "heritage": "Наследство",
+        "news": "Артикли",
+        "events": "Настани",
+        "gallery": "Галерија"
+      },
+      "footer": {
+        "contact": "Контакт",
+        "email": "Е-пошта",
+        "quickLinks": "Брзи линкови",
+        "copyright": "© 2026 Beetle Club Macedonia 🇲🇰"
+      }
+    },
+    "components": {
+      "beetleModel": {
+        "title": "Страст, наследство и заедница во едно движење",
+        "alt": "Бубата во движење"
+      },
+      "photoShowcase": {
+        "fallbackTitle": "Сликата не е достапна",
+        "fallbackSubtitle": "Освежи ја страницата",
+        "modalClose": "Затвори слика"
+      }
+    },
+    "pages": {
+      "events": {
+        "eyebrow": "Наскоро настани",
+        "title": "Календар на клубот",
+        "nextUp": "Следно",
+        "viewDetails": "Погледни детали",
+        "eventDetails": "Детали за настанот",
+        "dateLabel": "Датум",
+        "locationLabel": "Локација",
+        "backToEvents": "Назад кон настаните"
+      },
+      "gallery": {
+        "eyebrow": "Галерија",
+        "title": "Албуми на клубот",
+        "prev": "Претходна слика",
+        "next": "Следна слика"
+      },
+      "heritage": {
+        "eyebrow": "Нашето наследство",
+        "title": "Зачувување на наследството на Бубата",
+        "paragraphOne": "Буба Клуб Македонија беше основан од група страстни ентузијасти за Волксваген Буба со заедничка визија — да го зачува еден од најиконските автомобили на светот и да создаде заедница која го цени неговото наследство, инженерство и вечниот карактер. Откако беше основан, клубот се разви во место за сопственици, колекционери и обожаватели кои веруваат дека Бубата е повеќе од автомобил; таа е симбол на слобода, едноставност и генерации незаборавни спомени.",
+        "paragraphTwo": "Преку собири, патувања, изложби и настани низ Македонија, клубот го слави трајното наследство на Волксваген Бубата, додека инспирира нови генерации да ја ценат класичната автомобилска култура. Секој реставриран автомобил, секоја споделена приказна и секој километар возен одразуваат посветеност за зачувување на ова извонредно наследство за иднината."
+      },
+      "news": {
+        "eyebrow": "Најнови вести",
+        "title": "Вести од клубот",
+        "articles": [
+          {
+            "title": "Објавен викенд собир",
+            "body": "Доаѓајте кај нас на опуштен собир во текот на викендот со кафе, приказни и класични Буби."
+          },
+          {
+            "title": "Фокус на проектот за реставрација",
+            "body": "Нов член започна проект за реставрација и ја споделува напредокот и инспирацијата со заедницата."
+          },
+          {
+            "title": "Известување од клубот",
+            "body": "Подготвуваме посебен изложбен настан за следната сезона и наскоро ќе ги објавиме деталите."
+          }
+        ]
+      }
+    },
+    "home": {
+      "hero": {
+        "title": "За нас",
+        "body": "Буба Клуб Македонија е заедница на ентузијасти за класични Волксвагени посветена на зачувување на наследството на легендарниот Волксваген Буба и други ретки VW модели. Преку собири, изложби, патувања и проекти за реставрација, собираме луѓе кои споделуваат страст за автомобилиза историја, занат и timeless design. Без разлика дали сте долгогодишен колекционер, горд сопственик на Буба или едноставно обожавател на класични автомобили, нашиот клуб нуди место за поврзување, учење и славење на трајниот дух на заедницата на Волксваген."
+      },
+      "gallery": {
+        "button": "Погледни галерија"
+      },
+      "heritage": {
+        "title": "Наследство",
+        "body": "Буба Клуб Македонија е посветен на зачувување на историјата, наследството и духот на легендарниот Волксваген Буба. Се обединуваат со заедничка страст за класични автомобили, а нашите членови ја слават вечната дизајнерска естетика, занаетчиството и заедницата кои ја направија Бубата омилена симбол низ генерациите.",
+        "cta": "Сакате да дознаете повеќе? Посетете ја нашата страница за наследство за да ги откриете историјата на Буба Клуб Македонија, нашето патување, запаметливите моменти и наследството кое продолжуваме да го градиме заедно."
+      },
+      "cards": {
+        "member": {
+          "eyebrow": "Станете член",
+          "title": "Придружете се на заедницата на Буба",
+          "description": "Станете дел од пријателски круг на ентузијасти кои споделуваат приказни, реставрираат класични автомобили и го слават секој пат на Буба заедно.",
+          "button": "Приклучи се на Буба Клуб Македонија"
+        },
+        "news": {
+          "eyebrow": "Најнови вести",
+          "title": "Што се случува сега",
+          "items": [
+            "Скорешни настани и викенд собири",
+            "Известувања за клубот и ажурирања од заедницата",
+            "Проекти за реставрација и класични изградби"
+          ]
+        }
+      },
+      "partners": {
+        "eyebrow": "Нашите партнери",
+        "title": "Партнери на клубот во кои имаме доверба",
+        "items": [
+          "Партнер Еден",
+          "Партнер Два",
+          "Партнер Три",
+          "Партнер Четири"
+        ]
+      },
+      "socials": {
+        "title": "Следете не",
+        "items": [
+          "Инстаграм",
+          "Фејсбук",
+          "Јутјуб"
+        ]
+      },
+      "joinModal": {
+        "eyebrow": "Барање за членство",
+        "title": "Приклучи се на Буба Клуб Македонија",
+        "name": "Име",
+        "surname": "Презиме",
+        "email": "Е-пошта",
+        "description": "Опис",
+        "close": "Затвори го формуларот",
+        "cancel": "Откажи",
+        "submit": "Испрати барање"
+      }
+    }
+  }
+}
