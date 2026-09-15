@@ -1,3 +1,5 @@
+import { readUploadedGalleryPhotos } from './galleryUploads'
+
 export type GalleryPhoto = {
   src: string
   title?: string
@@ -105,8 +107,21 @@ export function normalizeDriveImageUrl(src: string) {
 
 export const galleryAlbums: GalleryAlbum[] = buildAlbumsFromAssets()
 
+export const getGalleryAlbumsWithUploads = (): GalleryAlbum[] => {
+  const uploadedByAlbum = readUploadedGalleryPhotos()
+
+  return galleryAlbums.map((album) => {
+    const uploadedPhotos = uploadedByAlbum[album.id] ?? []
+
+    return {
+      ...album,
+      photos: [...album.photos, ...uploadedPhotos],
+    }
+  })
+}
+
 export const getAllGalleryPhotos = (): GalleryHighlightPhoto[] =>
-  galleryAlbums.flatMap((album) =>
+  getGalleryAlbumsWithUploads().flatMap((album) =>
     album.photos.map((photo) => ({
       ...photo,
       albumId: album.id,

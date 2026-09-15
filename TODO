@@ -1,13 +1,12 @@
+# Finish data corrections and translations added
+# Figure out photo managment 
+# Add screen spinner for mobiles when device is flipped FOR PHOTO TOPBAR and others or add in eager loading for photos, might get fixed when photo managment is done
+# Connect the mailing system to automata push mail 
+# Add in other photots after photo managment 
+# DEMO feedback: 
 
-# Complete homage with sponsore page below
-# FINISH ADDING ALL PHOTOS AND LINKS from cloddy and  add in all photos and articals in assets gallery.ts
-# Delete or leave news page
-# check js scripts if they are good 
-# fix form to encompase entire screen not shell part and focus on form
-# fix selected gallery icon to encompass entire screen and focuse on photo
-# fix 3d unlock lock feature
-# FINAL STEP HOST 
-# mansonary type for the gallery ?
+
+# HOST
 
 
 # code snips: 

@@ -17,7 +17,7 @@
       </button>
 
       <button
-        v-for="album in galleryAlbums"
+        v-for="album in galleryAlbumsWithUploads"
         :key="album.id"
         class="folder-chip"
         :class="{ 'folder-chip--active': selectedAlbumId === album.id }"
@@ -62,6 +62,14 @@
       <div class="folder-view__meta">
         <h3>{{ selectedAlbum.title }}</h3>
         <p>{{ selectedAlbum.description }}</p>
+
+        <div class="upload-controls">
+          <label class="upload-button">
+            <input type="file" accept="image/*" @change="handleUpload" :disabled="uploading" />
+            <span>{{ uploading ? 'Uploading…' : 'Upload photo' }}</span>
+          </label>
+          <span v-if="uploadError" class="upload-error">{{ uploadError }}</span>
+        </div>
       </div>
 
       <div class="folder-grid">
@@ -110,7 +118,8 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { galleryAlbums, getRandomGalleryHighlights } from '../data_to_features/gallery'
+import { getGalleryAlbumsWithUploads, getRandomGalleryHighlights } from '../data_to_features/gallery'
+import { addUploadedGalleryPhoto, uploadGalleryPhoto } from '../data_to_features/galleryUploads'
 import { currentLanguageCode, currentTranslation } from '../data_to_features/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
@@ -119,15 +128,18 @@ const viewerOpen = ref(false)
 const viewerIndex = ref(0)
 const viewerOverlayRef = ref<HTMLElement | null>(null)
 const viewerCardRef = ref<HTMLElement | null>(null)
+const uploading = ref(false)
+const uploadError = ref('')
 
 let previousBodyOverflow = ''
 
-const randomHighlights = getRandomGalleryHighlights(12)
+const galleryAlbumsWithUploads = computed(() => getGalleryAlbumsWithUploads())
+const randomHighlights = computed(() => getRandomGalleryHighlights(12))
 const stackedHighlightGroups = computed(() => {
-  const groups: typeof randomHighlights[] = []
+  const groups: typeof randomHighlights.value[] = []
 
-  for (let index = 0; index < randomHighlights.length; index += 3) {
-    groups.push(randomHighlights.slice(index, index + 3))
+  for (let index = 0; index < randomHighlights.value.length; index += 3) {
+    groups.push(randomHighlights.value.slice(index, index + 3))
   }
 
   return groups.slice(0, 4)
@@ -162,7 +174,7 @@ const galleryLead = computed(() =>
 const highlightsLabel = computed(() => (currentLanguageCode.value === 'mkd' ? 'Издвоени' : 'Highlights'))
 
 const selectedAlbum = computed(() =>
-  selectedAlbumId.value ? galleryAlbums.find((album) => album.id === selectedAlbumId.value) ?? null : null,
+  selectedAlbumId.value ? galleryAlbumsWithUploads.value.find((album) => album.id === selectedAlbumId.value) ?? null : null,
 )
 
 const activePhoto = computed(() => {
@@ -172,6 +184,28 @@ const activePhoto = computed(() => {
 
 const openAlbumFromHighlight = (albumId: string) => {
   selectedAlbumId.value = albumId
+}
+
+const handleUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+
+  if (!file || !selectedAlbum.value) {
+    return
+  }
+
+  uploadError.value = ''
+  uploading.value = true
+
+  try {
+    const uploadedPhoto = await uploadGalleryPhoto(file)
+    addUploadedGalleryPhoto(selectedAlbum.value.id, uploadedPhoto)
+    input.value = ''
+  } catch (error) {
+    uploadError.value = error instanceof Error ? error.message : 'Unable to upload the photo.'
+  } finally {
+    uploading.value = false
+  }
 }
 
 const openViewer = (index: number) => {
@@ -459,6 +493,39 @@ onBeforeUnmount(() => {
   margin: 0.35rem 0 0;
   color: rgba(23, 26, 29, 0.8);
   line-height: 1.7;
+}
+
+.upload-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1rem;
+  background: #171a1d;
+  color: #f6f0e6;
+  border: 1px solid rgba(23, 26, 29, 0.12);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.upload-button input {
+  display: none;
+}
+
+.upload-error {
+  color: #8f1f1f;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .folder-grid {
