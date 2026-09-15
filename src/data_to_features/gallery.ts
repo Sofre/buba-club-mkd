@@ -19,6 +19,14 @@ export type GalleryHighlightPhoto = GalleryPhoto & {
   albumTitle: string
 }
 
+type GalleryManifestAlbum = {
+  id?: string
+  title?: string
+  description?: string
+  year?: number
+  photos?: Array<{ src: string; title?: string; caption?: string }>
+}
+
 const albumImageModules = import.meta.glob(
   [
     '../assets/albums/**/*.{jpg,jpeg,png,webp,avif,gif,JPG,JPEG,PNG,WEBP,AVIF,GIF}',
@@ -26,6 +34,43 @@ const albumImageModules = import.meta.glob(
   ],
   { eager: true, as: 'url' },
 ) as Record<string, string>
+
+const resolveGalleryUrl = (src: string) => {
+  const trimmed = src.trim()
+
+  if (!trimmed) {
+    return ''
+  }
+
+  if (/^(https?:)?\/\//i.test(trimmed) || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+    return trimmed
+  }
+
+  const configuredBase = import.meta.env.VITE_GALLERY_BASE_URL?.replace(/\/+$/, '')
+  if (configuredBase) {
+    if (trimmed.startsWith('/')) {
+      return `${configuredBase}${trimmed}`
+    }
+
+    return `${configuredBase}/${trimmed}`
+  }
+
+  return trimmed
+}
+
+const parsedGalleryManifest = (() => {
+  const rawManifest = import.meta.env.VITE_GALLERY_MANIFEST
+  if (!rawManifest) {
+    return [] as GalleryManifestAlbum[]
+  }
+
+  try {
+    const parsed = JSON.parse(rawManifest) as GalleryManifestAlbum[]
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return [] as GalleryManifestAlbum[]
+  }
+})()
 
 const toTitleCase = (value: string) =>
   value
@@ -102,10 +147,31 @@ export function normalizeDriveImageUrl(src: string) {
     return `https://drive.google.com/thumbnail?id=${folderMatch[1]}&sz=w1000`
   }
 
-  return trimmed
+  return resolveGalleryUrl(trimmed)
 }
 
-export const galleryAlbums: GalleryAlbum[] = buildAlbumsFromAssets()
+const buildAlbumsFromManifest = (manifestAlbums: GalleryManifestAlbum[]): GalleryAlbum[] =>
+  manifestAlbums
+    .map((album) => {
+      const albumId = album.id ?? toAlbumId(album.title ?? 'album')
+      const normalizedPhotos = (album.photos ?? []).map((photo) => ({
+        src: normalizeDriveImageUrl(photo.src),
+        title: photo.title ?? '',
+        caption: photo.caption ?? '',
+      }))
+
+      return {
+        id: albumId,
+        title: album.title ?? 'Album',
+        description: album.description ?? '',
+        year: album.year ?? extractYear(album.title ?? ''),
+        photos: normalizedPhotos,
+      }
+    })
+    .filter((album) => album.photos.length > 0)
+
+export const galleryAlbums: GalleryAlbum[] =
+  parsedGalleryManifest.length > 0 ? buildAlbumsFromManifest(parsedGalleryManifest) : buildAlbumsFromAssets()
 
 export const getGalleryAlbumsWithUploads = (): GalleryAlbum[] => {
   const uploadedByAlbum = readUploadedGalleryPhotos()

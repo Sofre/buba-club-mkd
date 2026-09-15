@@ -5,6 +5,14 @@ export default async function handler(request: Request): Promise<Response> {
     return Response.json({ error: 'Method not allowed' }, { status: 405 })
   }
 
+  const token = process.env.BLOB_READ_WRITE_TOKEN
+  if (!token) {
+    return Response.json(
+      { error: 'Missing BLOB_READ_WRITE_TOKEN environment variable for Vercel Blob uploads.' },
+      { status: 500 },
+    )
+  }
+
   const { searchParams } = new URL(request.url)
   const filename = searchParams.get('filename') ?? `gallery-${Date.now()}.jpg`
 
@@ -15,7 +23,7 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   try {
-    const blob = await put(filename, Buffer.from(body), {
+    const blob = await put(filename, new Uint8Array(body), {
       access: 'public',
     })
 
