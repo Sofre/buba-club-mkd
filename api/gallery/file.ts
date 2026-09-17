@@ -9,7 +9,16 @@ export default async function handler(request: Request): Promise<Response> {
       return Response.json({ error: 'Missing photo name.' }, { status: 400 })
     }
 
-    const blob = await get(name)
+    const result = await get(name, {
+      access: 'public',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    })
+
+    if (!result) {
+      return Response.json({ error: 'Photo not found.' }, { status: 404 })
+    }
+
+    const { blob } = result
 
     return Response.json({
       blob: {
