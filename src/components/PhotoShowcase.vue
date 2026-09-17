@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { normalizeDriveImageUrl, type GalleryPhoto } from '../data_to_features/gallery'
+import { type GalleryPhoto } from '../data_to_features/gallery'
 import { currentTranslation } from '../data_to_features/translations_state_change'
 
 const props = defineProps<{ photo: GalleryPhoto }>()
@@ -36,7 +36,7 @@ const content = computed(() => currentTranslation.value)
 const isOpen = ref(false)
 const imageError = ref(false)
 const isFolderLink = computed(() => props.photo.src.includes('/folders/'))
-const resolvedSrc = computed(() => normalizeDriveImageUrl(props.photo.src))
+const resolvedSrc = computed(() => props.photo.src)
 
 let previousBodyOverflow = ''
 

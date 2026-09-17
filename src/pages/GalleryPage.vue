@@ -63,13 +63,6 @@
         <h3>{{ selectedAlbum.title }}</h3>
         <p>{{ selectedAlbum.description }}</p>
 
-        <div class="upload-controls">
-          <label class="upload-button">
-            <input type="file" accept="image/*" @change="handleUpload" :disabled="uploading" />
-            <span>{{ uploading ? 'Uploading…' : 'Upload photo' }}</span>
-          </label>
-          <span v-if="uploadError" class="upload-error">{{ uploadError }}</span>
-        </div>
       </div>
 
       <div class="folder-grid">
@@ -117,24 +110,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { getGalleryAlbumsWithUploads, getRandomGalleryHighlights } from '../data_to_features/gallery'
-import { addUploadedGalleryPhoto, uploadGalleryPhoto } from '../data_to_features/galleryUploads'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { fetchVercelBlobPhotos, getRandomGalleryHighlights } from '../data_to_features/gallery'
 import { currentLanguageCode, currentTranslation } from '../data_to_features/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
 const selectedAlbumId = ref<string | null>(null)
+const galleryAlbumsWithUploads = ref<Awaited<ReturnType<typeof fetchVercelBlobPhotos>>>([])
+const randomHighlights = ref<Awaited<ReturnType<typeof getRandomGalleryHighlights>>>([])
 const viewerOpen = ref(false)
 const viewerIndex = ref(0)
 const viewerOverlayRef = ref<HTMLElement | null>(null)
 const viewerCardRef = ref<HTMLElement | null>(null)
-const uploading = ref(false)
-const uploadError = ref('')
-
 let previousBodyOverflow = ''
 
-const galleryAlbumsWithUploads = computed(() => getGalleryAlbumsWithUploads())
-const randomHighlights = computed(() => getRandomGalleryHighlights(12))
 const stackedHighlightGroups = computed(() => {
   const groups: typeof randomHighlights.value[] = []
 
@@ -173,6 +162,11 @@ const galleryLead = computed(() =>
 
 const highlightsLabel = computed(() => (currentLanguageCode.value === 'mkd' ? 'Издвоени' : 'Highlights'))
 
+onMounted(async () => {
+  galleryAlbumsWithUploads.value = await fetchVercelBlobPhotos()
+  randomHighlights.value = await getRandomGalleryHighlights(12)
+})
+
 const selectedAlbum = computed(() =>
   selectedAlbumId.value ? galleryAlbumsWithUploads.value.find((album) => album.id === selectedAlbumId.value) ?? null : null,
 )
@@ -184,28 +178,6 @@ const activePhoto = computed(() => {
 
 const openAlbumFromHighlight = (albumId: string) => {
   selectedAlbumId.value = albumId
-}
-
-const handleUpload = async (event: Event) => {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-
-  if (!file || !selectedAlbum.value) {
-    return
-  }
-
-  uploadError.value = ''
-  uploading.value = true
-
-  try {
-    const uploadedPhoto = await uploadGalleryPhoto(file)
-    addUploadedGalleryPhoto(selectedAlbum.value.id, uploadedPhoto)
-    input.value = ''
-  } catch (error) {
-    uploadError.value = error instanceof Error ? error.message : 'Unable to upload the photo.'
-  } finally {
-    uploading.value = false
-  }
 }
 
 const openViewer = (index: number) => {

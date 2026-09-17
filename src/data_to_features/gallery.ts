@@ -1,5 +1,3 @@
-import { readUploadedGalleryPhotos } from './galleryUploads'
-
 export type GalleryPhoto = {
   src: string
   title?: string
@@ -19,12 +17,9 @@ export type GalleryHighlightPhoto = GalleryPhoto & {
   albumTitle: string
 }
 
-type GalleryManifestAlbum = {
-  id?: string
-  title?: string
-  description?: string
-  year?: number
-  photos?: Array<{ src: string; title?: string; caption?: string }>
+type GalleryBlob = {
+  url: string
+  pathname: string
 }
 
 const albumImageModules = import.meta.glob(
@@ -34,43 +29,6 @@ const albumImageModules = import.meta.glob(
   ],
   { eager: true, as: 'url' },
 ) as Record<string, string>
-
-const resolveGalleryUrl = (src: string) => {
-  const trimmed = src.trim()
-
-  if (!trimmed) {
-    return ''
-  }
-
-  if (/^(https?:)?\/\//i.test(trimmed) || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
-    return trimmed
-  }
-
-  const configuredBase = import.meta.env.VITE_GALLERY_BASE_URL?.replace(/\/+$/, '')
-  if (configuredBase) {
-    if (trimmed.startsWith('/')) {
-      return `${configuredBase}${trimmed}`
-    }
-
-    return `${configuredBase}/${trimmed}`
-  }
-
-  return trimmed
-}
-
-const parsedGalleryManifest = (() => {
-  const rawManifest = import.meta.env.VITE_GALLERY_MANIFEST
-  if (!rawManifest) {
-    return [] as GalleryManifestAlbum[]
-  }
-
-  try {
-    const parsed = JSON.parse(rawManifest) as GalleryManifestAlbum[]
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return [] as GalleryManifestAlbum[]
-  }
-})()
 
 const toTitleCase = (value: string) =>
   value
@@ -134,60 +92,64 @@ const buildAlbumsFromAssets = (): GalleryAlbum[] => {
     .filter((album) => album.photos.length > 0)
 }
 
-export function normalizeDriveImageUrl(src: string) {
-  const trimmed = src.trim()
+export const galleryAlbums: GalleryAlbum[] = buildAlbumsFromAssets()
 
-  const fileMatch = trimmed.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/)
-  if (fileMatch) {
-    return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`
-  }
-
-  const folderMatch = trimmed.match(/\/folders\/([a-zA-Z0-9_-]+)/)
-  if (folderMatch) {
-    return `https://drive.google.com/thumbnail?id=${folderMatch[1]}&sz=w1000`
-  }
-
-  return resolveGalleryUrl(trimmed)
+const titleFromPathname = (pathname: string) => {
+  const filename = pathname.split('/').pop() ?? pathname
+  return toTitleCase(filename.replace(/\.[^.]+$/, ''))
 }
 
-const buildAlbumsFromManifest = (manifestAlbums: GalleryManifestAlbum[]): GalleryAlbum[] =>
-  manifestAlbums
-    .map((album) => {
-      const albumId = album.id ?? toAlbumId(album.title ?? 'album')
-      const normalizedPhotos = (album.photos ?? []).map((photo) => ({
-        src: normalizeDriveImageUrl(photo.src),
-        title: photo.title ?? '',
-        caption: photo.caption ?? '',
-      }))
+const albumFolderFromPathname = (pathname: string) => {
+  const folders = pathname.split('/').filter(Boolean).map((folder) => decodeURIComponent(folder))
 
-      return {
-        id: albumId,
-        title: album.title ?? 'Album',
-        description: album.description ?? '',
-        year: album.year ?? extractYear(album.title ?? ''),
-        photos: normalizedPhotos,
-      }
-    })
-    .filter((album) => album.photos.length > 0)
+  return folders[0]?.toLowerCase() === 'albums' ? folders[1] : folders[0]
+}
 
-export const galleryAlbums: GalleryAlbum[] =
-  parsedGalleryManifest.length > 0 ? buildAlbumsFromManifest(parsedGalleryManifest) : buildAlbumsFromAssets()
+export const fetchVercelBlobPhotos = async (): Promise<GalleryAlbum[]> => {
+  try {
+    const response = await fetch('/api/gallery/list', { cache: 'no-store' })
 
-export const getGalleryAlbumsWithUploads = (): GalleryAlbum[] => {
-  const uploadedByAlbum = readUploadedGalleryPhotos()
-
-  return galleryAlbums.map((album) => {
-    const uploadedPhotos = uploadedByAlbum[album.id] ?? []
-
-    return {
-      ...album,
-      photos: [...album.photos, ...uploadedPhotos],
+    if (!response.ok) {
+      throw new Error(`Gallery request failed with status ${response.status}`)
     }
-  })
+
+    const data = (await response.json()) as { blobs?: GalleryBlob[] }
+    const albums = galleryAlbums.map((album) => ({ ...album, photos: [...album.photos] }))
+
+    for (const blob of data.blobs ?? []) {
+      const albumFolder = albumFolderFromPathname(blob.pathname)
+
+      if (!albumFolder) {
+        continue
+      }
+
+      const albumId = toAlbumId(albumFolder)
+      let album = albums.find((candidate) => candidate.id === albumId || toAlbumId(candidate.title) === albumId)
+
+      if (!album) {
+        album = {
+          id: albumId,
+          title: albumFolder,
+          description: '',
+          year: extractYear(albumFolder),
+          photos: [],
+        }
+        albums.push(album)
+      }
+
+      if (!album.photos.some((photo) => photo.src === blob.url)) {
+        album.photos.push({ src: blob.url, title: titleFromPathname(blob.pathname) })
+      }
+    }
+
+    return albums
+  } catch {
+    return galleryAlbums
+  }
 }
 
-export const getAllGalleryPhotos = (): GalleryHighlightPhoto[] =>
-  getGalleryAlbumsWithUploads().flatMap((album) =>
+export const getAllGalleryPhotos = async (): Promise<GalleryHighlightPhoto[]> =>
+  (await fetchVercelBlobPhotos()).flatMap((album) =>
     album.photos.map((photo) => ({
       ...photo,
       albumId: album.id,
@@ -195,8 +157,8 @@ export const getAllGalleryPhotos = (): GalleryHighlightPhoto[] =>
     })),
   )
 
-export const getRandomGalleryHighlights = (count = 6): GalleryHighlightPhoto[] => {
-  const allPhotos = getAllGalleryPhotos()
+export const getRandomGalleryHighlights = async (count = 6): Promise<GalleryHighlightPhoto[]> => {
+  const allPhotos = await getAllGalleryPhotos()
 
   if (allPhotos.length <= count) {
     return allPhotos
