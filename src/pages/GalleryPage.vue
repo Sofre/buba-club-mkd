@@ -67,13 +67,19 @@
 
       <div class="folder-grid">
         <button
-          v-for="(photo, index) in selectedAlbum.photos"
-          :key="`${selectedAlbum.id}-${photo.src}-${index}`"
+          v-for="photo in visibleAlbumPhotos"
+          :key="`${selectedAlbum.id}-${photo.src}`"
           class="folder-photo"
           type="button"
-          @click="openViewer(index)"
+          @click="openViewer(selectedAlbum.photos.indexOf(photo))"
         >
           <img :src="photo.thumbnailSrc || photo.src" :alt="photo.title || selectedAlbum.title" loading="lazy" />
+        </button>
+      </div>
+
+      <div v-if="hasMoreAlbumPhotos" ref="loadMoreSentinelRef" class="folder-view__load-more">
+        <button class="load-more-button" type="button" @click="loadMoreAlbumPhotos">
+          {{ currentLanguageCode === 'mkd' ? 'Вчитај повеќе' : 'Load more' }}
         </button>
       </div>
     </section>
@@ -122,7 +128,12 @@ const viewerOpen = ref(false)
 const viewerIndex = ref(0)
 const viewerOverlayRef = ref<HTMLElement | null>(null)
 const viewerCardRef = ref<HTMLElement | null>(null)
+const loadMoreSentinelRef = ref<HTMLElement | null>(null)
 let previousBodyOverflow = ''
+
+const albumBatchSize = 6
+const albumVisibleCount = ref(albumBatchSize)
+let loadMoreObserver: IntersectionObserver | null = null
 
 const stackedHighlightGroups = computed(() => {
   const groups: typeof randomHighlights.value[] = []
@@ -170,6 +181,28 @@ onMounted(async () => {
 const selectedAlbum = computed(() =>
   selectedAlbumId.value ? galleryAlbumsWithUploads.value.find((album) => album.id === selectedAlbumId.value) ?? null : null,
 )
+
+const visibleAlbumPhotos = computed(() => selectedAlbum.value?.photos.slice(0, albumVisibleCount.value) ?? [])
+const hasMoreAlbumPhotos = computed(() => (selectedAlbum.value?.photos.length ?? 0) > albumVisibleCount.value)
+
+const loadMoreAlbumPhotos = () => {
+  albumVisibleCount.value += albumBatchSize
+}
+
+watch(selectedAlbum, () => {
+  albumVisibleCount.value = albumBatchSize
+})
+
+watch(loadMoreSentinelRef, async (sentinel) => {
+  loadMoreObserver?.disconnect()
+  if (!sentinel || typeof IntersectionObserver === 'undefined') return
+
+  await nextTick()
+  loadMoreObserver = new IntersectionObserver(([entry]) => {
+    if (entry?.isIntersecting && hasMoreAlbumPhotos.value) loadMoreAlbumPhotos()
+  })
+  loadMoreObserver.observe(sentinel)
+})
 
 const activePhoto = computed(() => {
   if (!selectedAlbum.value) return null
@@ -220,6 +253,7 @@ onBeforeUnmount(() => {
   if (typeof document !== 'undefined') {
     document.body.style.overflow = previousBodyOverflow
   }
+  loadMoreObserver?.disconnect()
 })
 
 </script>
@@ -473,6 +507,24 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.75rem;
   margin-top: 0.9rem;
+}
+
+.folder-view__load-more {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.4rem;
+}
+
+.load-more-button {
+  border: 1px solid rgba(23, 26, 29, 0.14);
+  background: rgba(255, 255, 255, 0.2);
+  color: #1a1d20;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
 }
 
 .upload-button {
