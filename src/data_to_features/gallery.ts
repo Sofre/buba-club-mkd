@@ -1,5 +1,6 @@
 export type GalleryPhoto = {
   src: string
+  thumbnailSrc?: string
   title?: string
   caption?: string
 }
@@ -20,6 +21,7 @@ export type GalleryHighlightPhoto = GalleryPhoto & {
 type GalleryBlob = {
   url: string
   pathname: string
+  thumbnailUrl?: string
 }
 
 const albumImageModules = import.meta.glob(
@@ -138,7 +140,7 @@ export const fetchVercelBlobPhotos = async (): Promise<GalleryAlbum[]> => {
       }
 
       if (!album.photos.some((photo) => photo.src === blob.url)) {
-        album.photos.push({ src: blob.url, title: titleFromPathname(blob.pathname) })
+        album.photos.push({ src: blob.url, thumbnailSrc: blob.thumbnailUrl, title: titleFromPathname(blob.pathname) })
       }
     }
 

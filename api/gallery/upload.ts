@@ -1,4 +1,5 @@
 import { put } from '@vercel/blob'
+import sharp from 'sharp'
 
 export async function POST(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
@@ -23,14 +24,23 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
-    const blob = await put(filename, new Uint8Array(body), {
+    const blob = await put(filename, body, {
       access: 'public',
+      token,
+    })
+    const thumbnailFilename = `${filename.replace(/\.[^.]+$/, '')}-thumb.webp`
+    const thumbnail = await sharp(body).resize(640, 640, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 72 }).toBuffer()
+    const thumbnailBlob = await put(thumbnailFilename, thumbnail, {
+      access: 'public',
+      token,
+      contentType: 'image/webp',
     })
 
     return Response.json({
       url: blob.url,
       pathname: blob.pathname,
       contentType: blob.contentType,
+      thumbnailUrl: thumbnailBlob.url,
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to upload image to Vercel Blob.'

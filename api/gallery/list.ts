@@ -14,15 +14,23 @@ export async function GET(request: Request): Promise<Response> {
     const { searchParams } = new URL(request.url)
     const prefix = searchParams.get('prefix') ?? ''
     const { blobs } = await list({ prefix, token, abortSignal: controller.signal, limit: 1000 })
+    const thumbnails = new Map(
+      blobs
+        .filter((blob) => blob.pathname.endsWith('-thumb.webp'))
+        .map((blob) => [blob.pathname, blob.url]),
+    )
 
     return Response.json({
-      blobs: blobs.map((blob) => ({
+      blobs: blobs
+        .filter((blob) => !blob.pathname.endsWith('-thumb.webp'))
+        .map((blob) => ({
         url: blob.url,
         name: blob.pathname,
         pathname: blob.pathname,
+        thumbnailUrl: thumbnails.get(`${blob.pathname.replace(/\.[^.]+$/, '')}-thumb.webp`),
         size: blob.size,
         uploadedAt: blob.uploadedAt,
-      })),
+        })),
     })
   } catch (error) {
     const message = error instanceof Error && error.name === 'AbortError'
