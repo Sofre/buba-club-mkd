@@ -1,6 +1,6 @@
 import { get } from '@vercel/blob'
 
-export default async function handler(request: Request): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   try {
     const { searchParams } = new URL(request.url)
     const name = searchParams.get('name')

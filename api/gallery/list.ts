@@ -1,6 +1,6 @@
 import { list } from '@vercel/blob'
 
-export default async function handler(request: Request): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   const token = process.env.BLOB_READ_WRITE_TOKEN
 
   if (!token) {
