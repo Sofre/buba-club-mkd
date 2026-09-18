@@ -39,7 +39,7 @@
             class="stacked-showcase__item"
             :style="stackStyle(stackIndex, index)"
           >
-            <img :src="photo.src" :alt="photo.title || photo.albumTitle" loading="lazy" />
+            <img :src="previewSrc(photo.src)" :alt="photo.title || photo.albumTitle" loading="lazy" />
           </figure>
         </div>
       </div>
@@ -52,7 +52,7 @@
           type="button"
           @click="openAlbumFromHighlight(photo.albumId)"
         >
-          <img :src="photo.src" :alt="photo.title || photo.albumTitle" loading="lazy" />
+          <img :src="previewSrc(photo.src)" :alt="photo.title || photo.albumTitle" loading="lazy" />
           <span>{{ photo.albumTitle }}</span>
         </button>
       </div>
@@ -73,7 +73,7 @@
           type="button"
           @click="openViewer(index)"
         >
-          <img :src="photo.src" :alt="photo.title || selectedAlbum.title" loading="lazy" />
+          <img :src="previewSrc(photo.src)" :alt="photo.title || selectedAlbum.title" loading="lazy" />
         </button>
       </div>
     </section>
@@ -112,12 +112,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { fetchVercelBlobPhotos, getRandomGalleryHighlights } from '../data_to_features/gallery'
+import { getGalleryThumbnail } from '../data_to_features/galleryThumbnails'
 import { currentLanguageCode, currentTranslation } from '../data_to_features/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
 const selectedAlbumId = ref<string | null>(null)
 const galleryAlbumsWithUploads = ref<Awaited<ReturnType<typeof fetchVercelBlobPhotos>>>([])
 const randomHighlights = ref<Awaited<ReturnType<typeof getRandomGalleryHighlights>>>([])
+const previewUrls = ref<Record<string, string>>({})
 const viewerOpen = ref(false)
 const viewerIndex = ref(0)
 const viewerOverlayRef = ref<HTMLElement | null>(null)
@@ -174,6 +176,25 @@ const selectedAlbum = computed(() =>
 const activePhoto = computed(() => {
   if (!selectedAlbum.value) return null
   return selectedAlbum.value.photos[viewerIndex.value] ?? null
+})
+
+const previewSrc = (source: string) => previewUrls.value[source] ?? source
+
+const cachePreviews = async (sources: string[]) => {
+  await Promise.all(
+    [...new Set(sources)].map(async (source) => {
+      const thumbnail = await getGalleryThumbnail(source)
+      previewUrls.value[source] = thumbnail
+    }),
+  )
+}
+
+watch(randomHighlights, (highlights) => {
+  void cachePreviews(highlights.map((photo) => photo.src))
+})
+
+watch(selectedAlbum, (album) => {
+  if (album) void cachePreviews(album.photos.map((photo) => photo.src))
 })
 
 const openAlbumFromHighlight = (albumId: string) => {
