@@ -1,11 +1,9 @@
 # Finish data corrections and translations added
-# Figure out photo managment 
 # Add screen spinner for mobiles when device is flipped FOR PHOTO TOPBAR and others or add in eager loading for photos, might get fixed when photo managment is done
 # Connect the mailing system to automata push mail 
-# Add in other photots after photo managment
-# Add in error 404 handling or error handling 
-# Adjust events banner to show date days , hours , seconds till next meet instead of shortcut date
-
+# Add in error handling in new folder.. error sites custom
+# Add a press me button on event banner 
+# Add for mobile a carosel button when presed it jumps you to the menu 
 # HOST
 
 
