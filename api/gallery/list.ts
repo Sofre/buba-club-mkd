@@ -20,17 +20,24 @@ export async function GET(request: Request): Promise<Response> {
         .map((blob) => [blob.pathname, blob.url]),
     )
 
+    // 👇 ADDED HEADERS IN THE RETURN STATEMENT BELOW TO CACHE THE ALBUM DATA 👇
     return Response.json({
       blobs: blobs
         .filter((blob) => !blob.pathname.endsWith('-thumb.webp'))
         .map((blob) => ({
-        url: blob.url,
-        name: blob.pathname,
-        pathname: blob.pathname,
-        thumbnailUrl: thumbnails.get(`${blob.pathname.replace(/\.[^.]+$/, '')}-thumb.webp`),
-        size: blob.size,
-        uploadedAt: blob.uploadedAt,
+          url: blob.url,
+          name: blob.pathname,
+          pathname: blob.pathname,
+          thumbnailUrl: thumbnails.get(`${blob.pathname.replace(/\.[^.]+$/, '')}-thumb.webp`),
+          size: blob.size,
+          uploadedAt: blob.uploadedAt,
         })),
+    }, {
+      headers: {
+        // Caches this list on Vercel's CDN for 1 hour (3600 seconds).
+        // Automatically serves a fast cached version while refreshing data silently in the background.
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+      }
     })
   } catch (error) {
     const message = error instanceof Error && error.name === 'AbortError'

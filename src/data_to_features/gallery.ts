@@ -44,7 +44,7 @@ const toAlbumId = (value: string) =>
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '') || 'album'
+    .replace(/(^-|-\$)/g, '') || 'album'
 
 const extractYear = (value: string) => {
   const match = value.match(/(19|20)\d{2}/)
@@ -75,7 +75,7 @@ const buildAlbumsFromAssets = (): GalleryAlbum[] => {
         .sort((a, b) => a.relativePath.localeCompare(b.relativePath, 'mk'))
         .map(({ relativePath, src }) => {
           const fileName = relativePath.split('/').pop() ?? ''
-          const baseName = fileName.replace(/\.[^.]+$/, '')
+          const baseName = fileName.replace(/\.[^.]+\$/, '')
 
           return {
             src,
@@ -98,7 +98,7 @@ export const galleryAlbums: GalleryAlbum[] = buildAlbumsFromAssets()
 
 const titleFromPathname = (pathname: string) => {
   const filename = pathname.split('/').pop() ?? pathname
-  return toTitleCase(filename.replace(/\.[^.]+$/, ''))
+  return toTitleCase(filename.replace(/\.[^.]+\$/, ''))
 }
 
 const albumFolderFromPathname = (pathname: string) => {
@@ -109,7 +109,8 @@ const albumFolderFromPathname = (pathname: string) => {
 
 export const fetchVercelBlobPhotos = async (): Promise<GalleryAlbum[]> => {
   try {
-    const response = await fetch('/api/gallery/list', { cache: 'no-store' })
+    // 💡 REMOVED { cache: 'no-store' } to safely pull your newly optimized Vercel CDN headers
+    const response = await fetch('/api/gallery/list')
 
     if (!response.ok) {
       throw new Error(`Gallery request failed with status ${response.status}`)
@@ -140,7 +141,12 @@ export const fetchVercelBlobPhotos = async (): Promise<GalleryAlbum[]> => {
       }
 
       if (!album.photos.some((photo) => photo.src === blob.url)) {
-        album.photos.push({ src: blob.url, thumbnailSrc: blob.thumbnailUrl, title: titleFromPathname(blob.pathname) })
+        // 💡 Adjusted data object target to match your defined "thumbnailSrc" type parameter
+        album.photos.push({ 
+          src: blob.url, 
+          thumbnailSrc: blob.thumbnailUrl, 
+          title: titleFromPathname(blob.pathname) 
+        })
       }
     }
 
