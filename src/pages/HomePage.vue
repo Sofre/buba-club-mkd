@@ -3,13 +3,13 @@
     <section class="story-block">
       <div class="story-block__image" :style="{ backgroundImage: `url(${storyImage})` }" aria-label="Classic Beetle club photo" />
       <div class="story-block__content">
-        <p class="section-tag section-tag--muted">{{ content.home.about?.eyebrow || 'About the club' }}</p>
-        <h2>{{ content.home.about?.title || 'A machine, a culture, a community.' }}</h2>
-        <p>{{ content.home.about?.description || content.home.hero.body }}</p>
+        <p class="section-tag section-tag--muted">{{ content.home.hero.title || 'About the club' }}</p>
+        <h2>{{ content.home.hero.eyebrow || 'A machine, a culture, a community.' }}</h2>
+        <p>{{ content.home.hero.body }}</p>
         <ul class="story-points">
-          <li>Classic Volkswagen gatherings</li>
-          <li>Community restoration culture</li>
-          <li>Events, stories and shared history</li>
+          <li>{{ content.home.hero.storypoint1  }}</li>
+          <li>{{ content.home.hero.storypoint2 }}</li>
+          <li>{{ content.home.hero.storypoint3 }}</li>
         </ul>
         <button class="button button--primary" type="button" @click="openJoinForm">{{ content.home.cards.member.button }}</button>
       </div>
@@ -78,8 +78,8 @@
     <section class="gallery-section">
       <div class="section-header">
         <div>
-          <p class="section-tag section-tag--muted">{{ content.home.gallery?.eyebrow || 'Archive' }}</p>
-          <h2>{{ content.home.gallery?.title || 'Club moments' }}</h2>
+          <p class="section-tag section-tag--muted">{{ content.home.gallery.title || 'club gallery' }}</p>
+          <h2>{{ content.home.gallery.eyebrow || 'Club moments' }}</h2>
         </div>
         <router-link class="inline-link" to="/gallery">Open gallery</router-link>
       </div>
@@ -102,14 +102,14 @@
 
       <div class="timeline">
         <article class="timeline-item">
-          <span class="timeline-item__year">1968</span>
+          <span class="timeline-item__year">2001</span>
           <div class="timeline-item__content">
             <h3>The beginning</h3>
             <p>Our story starts with the love for the air-cooled classic, the community around it and the rituals of the drive.</p>
           </div>
         </article>
         <article class="timeline-item">
-          <span class="timeline-item__year">1975</span>
+          <span class="timeline-item__year">2016</span>
           <div class="timeline-item__content">
             <h3>Shared identity</h3>
             <p>The club began to grow through regular meetups, restoration stories and a shared passion for bringing old machines back to life.</p>
@@ -151,22 +151,7 @@
       </div>
     </section>
 
-    <section class="social-strip">
-      <div class="social-logo-wall" :aria-label="content.home.socials.title">
-        <a
-          v-for="social in socials"
-          :key="social.name"
-          :href="social.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-logo-link"
-          :aria-label="social.name"
-          :title="social.name"
-        >
-          <span class="social-icon" :class="`social-icon--${social.network}`" v-html="social.icon" />
-        </a>
-      </div>
-    </section>
+    
 
     <teleport to="body">
       <div v-if="isJoinFormOpen" ref="joinOverlayRef" class="join-modal-overlay" @click.self="closeJoinForm">
@@ -290,31 +275,6 @@ const pastPartnersCopy = computed(() =>
         title: 'Old partners',
       },
 )
-
-const socials = computed(() => {
-  const socialNames = ((currentTranslation.value.home?.socials?.items as string[]) ?? []).filter(Boolean)
-  return [
-    {
-      network: 'instagram',
-      name: socialNames[0] ?? 'Instagram',
-      url: 'https://www.instagram.com/bubaklubmakedonija/',
-      icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"></circle><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"></circle></svg>',
-    },
-    {
-      network: 'facebook',
-      name: socialNames[1] ?? 'Facebook',
-      url: 'https://www.facebook.com/',
-      icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 8.2h2.2V4.7c-.4-.1-1.8-.3-3.4-.3-3.4 0-5.7 2.1-5.7 5.9v2.1H5.4v3.5h2.2V22h3.6v-6.1h3l.5-3.5h-3.5v-1.8c0-1 .3-2.4 1.3-2.4Z" fill="currentColor"></path></svg>'
-    },
-      {
-      network: 'youtube',
-      name: socialNames[2] ?? 'YouTube',
-      url: 'https://www.youtube.com/',
-      icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7.2a2.8 2.8 0 0 0-2-2C17.9 4.7 12 4.7 12 4.7s-5.9 0-7.6.5a2.8 2.8 0 0 0-2 2A29.2 29.2 0 0 0 2 12a29.2 29.2 0 0 0 .4 4.8 2.8 2.8 0 0 0 2 2c1.7.5 7.6.5 7.6.5s5.9 0 7.6-.5a2.8 2.8 0 0 0 2-2A29.2 29.2 0 0 0 22 12a29.2 29.2 0 0 0-.4-4.8ZM10 15.5v-7l6 3.5-6 3.5Z" fill="currentColor"></path></svg>',
-    },
-  ]
-})
-
 const galleryAlbum = computed(() => {
   if (!galleryAlbums.length) {
     return undefined

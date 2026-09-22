@@ -55,7 +55,7 @@
         "backToEvents": "Back to events"
       },
       "gallery": {
-        "eyebrow": "Gallery",
+        "eyebrow": "Club gallery",
         "title": "Club albums",
         "prev": "Previous photo",
         "next": "Next photo"
@@ -87,10 +87,17 @@
     },
     "home": {
       "hero": {
-        "title": "About us",
-        "body": "Buba Club Macedonia is a community of classic Volkswagen enthusiasts dedicated to preserving the legacy of the iconic Volkswagen Beetle and other vintage VW models. Through gatherings, exhibitions, road trips, and restoration projects, we bring together people who share a passion for automotive history, craftsmanship, and timeless design. Whether you are a long-time collector, a proud Beetle owner, or simply an admirer of classic automobiles, our club offers a place to connect, learn, and celebrate the enduring spirit of the Volkswagen community."
+        "title": "We are Beetle Club Macedonia",
+        "eyebrow": "About Us",
+        "body": "Buba Club Macedonia is a community of classic Volkswagen enthusiasts dedicated to preserving the legacy of the iconic Volkswagen Beetle and other vintage VW models. Through gatherings, exhibitions and road trips we bring together people who share a passion for automotive history, craftsmanship, and timeless design. Whether you are a long-time collector, a proud Beetle owner, or simply an admirer of classic automobiles, our club offers a place to connect, learn, and celebrate the enduring spirit of the Volkswagen community.",
+        "storypoint1": "Classic Volkswagen gatherings",
+        "storypoint2": "Community",
+        "storypoint3": "Events, stories and shared history"
+  
       },
       "gallery": {
+        "title": "club gallery",
+        "еyebrow": "Our Photos",
         "button": "View Gallery"
       },
       "heritage": {
@@ -177,6 +184,7 @@
         "email": "Е-пошта",
         "quickLinks": "Брзи линкови",
         "copyright": "© 2026 Beetle Club Macedonia 🇲🇰"
+        
       }
     },
     "components": {
@@ -202,7 +210,7 @@
         "backToEvents": "Назад кон настаните"
       },
       "gallery": {
-        "eyebrow": "Галерија",
+        "eyebrow": "Клубска галерија",
         "title": "Албуми на клубот",
         "prev": "Претходна слика",
         "next": "Следна слика"
@@ -234,10 +242,16 @@
     },
     "home": {
       "hero": {
-        "title": "За нас",
-        "body": "Буба Клуб Македонија е заедница на ентузијасти за класични Волксвагени посветена на зачувување на наследството на легендарниот Волксваген Буба и други ретки VW модели. Преку собири, изложби, патувања и проекти за реставрација, собираме луѓе кои споделуваат страст за автомобилиза историја, занат и timeless design. Без разлика дали сте долгогодишен колекционер, горд сопственик на Буба или едноставно обожавател на класични автомобили, нашиот клуб нуди место за поврзување, учење и славење на трајниот дух на заедницата на Волксваген."
+        "title": "Ние сме Буба Клуб Македонија ",
+         "eyebrow": "За нас",
+        "body": "Буба Клуб Македонија е заедница на ентузијасти за класични Волксвагени посветена на зачувување на наследството на легендарниот Волксваген Буба и други ретки VW модели. Преку собири, изложби, и патувања собираме луѓе кои споделуваат страст за автомобилиза историја, занат и безвременски design. Без разлика дали сте долгогодишен колекционер, горд сопственик на Буба или едноставно обожавател на класични автомобили, нашиот клуб нуди место за поврзување, учење и славење на трајниот дух на заедницата на Волксваген.",
+        "storypoint1": "Класични волксваген собири",
+        "storypoint2": "Заедница",
+        "storypoint3": "Настани и заедничка историја"
       },
       "gallery": {
+        "title": "клуб галерија",
+        "eyebrow": "Наши слики",
         "button": "Погледни галерија"
       },
       "heritage": {

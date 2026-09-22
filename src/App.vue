@@ -146,6 +146,17 @@
             <router-link to="/gallery">{{ currentContent.app.nav.gallery }}</router-link>
           </nav>
         </section>
+
+        <section class="stamp-module">
+           <p class="stamp-label">{{ currentContent.home.socials.title }}</p>
+           <ul class="stamp-list">
+            <li> <a class="stamp-link" href="mailto:dukisofronievski@gmail.com">Facebook</a></li>
+            <li> <a class="stamp-link" href="mailto:dukisofronievski@gmail.com">Instagram</a></li>
+            <li> <a class="stamp-link" href="mailto:dukisofronievski@gmail.com">X</a></li>
+          </ul>
+        </section>
+
+
       </div>
 
       <div class="footer-plate__bottom">
@@ -446,7 +457,7 @@ router.beforeEach(() => {
   align-items: center;
   justify-content: center;
   background: #7a0000;
-  background-image: linear-gradient(135deg, #7a0000 0%, #3d0000 100%);
+  background-image:  #7a0000;
   opacity: 1;
   visibility: visible;
   transition: opacity 0.45s ease, visibility 0.45s ease;

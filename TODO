@@ -1,10 +1,20 @@
-# Finish data corrections and translations added
-# Add screen spinner for mobiles when device is flipped FOR PHOTO TOPBAR and others or add in eager loading for photos, might get fixed when photo managment is done
-# Connect the mailing system to automata push mail 
-# Add in error handling in new folder.. error sites custom
-# Add a press me button on event banner 
-# Add for mobile a carosel button when presed it jumps you to the menu 
-# HOST
+# Finish data corrections and translations added - nekoj so tiberie za history
+# Finish Artical section
+# Gallery home section previwe attach on cloudy img urls 
+# Add a press me button (hint) on event banner
+# Remove gradient on form button
+# Map links for socials on footer
+# Resize nav to be smaller and topbar and logo to be bigger for phones
+# Favicon -> beetle logo
+
+# HOST - domain name set up
+
+
+# Future prod:
+# Connect the mailing system to automata push mail - post prod 
+# Add in error handling in new folder.. error sites custom - post prod
+
+
 
 
 # code snips: 

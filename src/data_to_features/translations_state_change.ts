@@ -4,7 +4,7 @@ import translations from './translations.json'
 export type LanguageCode = keyof typeof translations
 
 const state = reactive({
-  language: 'eng' as LanguageCode,
+  language: 'mkd' as LanguageCode,
 })
 
 export const currentLanguageCode = computed({
