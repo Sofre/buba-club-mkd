@@ -15,66 +15,6 @@
       </div>
     </section>
 
-    <section class="content-section">
-      <div class="section-header">
-        <div>
-          <p class="section-tag section-tag--muted">{{ content.home.cards.news.eyebrow }}</p>
-          <h2>{{ articlePageCopy.title }}</h2>
-        </div>
-        <router-link class="inline-link" to="/articles">All articles</router-link>
-      </div>
-
-      <div class="articles-list">
-        <article v-for="article in featuredArticles" :key="article.id" class="article-card">
-          <div class="article-card__meta">
-            <span class="article-card__dot" aria-hidden="true" />
-            <span class="article-card__date">{{ formatArticleDate(article.postedAt) }}</span>
-            <span class="article-card__tag">{{ article.tag }}</span>
-          </div>
-
-          <div class="article-card__body">
-            <h3>{{ article.title }}</h3>
-            <p>{{ article.body }}</p>
-
-            <img
-              v-if="article.kind === 'photo' && article.imageUrl"
-              :src="article.imageUrl"
-              :alt="article.title"
-              class="article-card__media"
-              loading="lazy"
-            />
-
-            <div v-else-if="article.kind === 'video' && article.videoUrl" class="article-card__video-wrap">
-              <iframe
-                :src="normalizeYoutubeEmbed(article.videoUrl)"
-                :title="article.title"
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
-              />
-            </div>
-
-            <a
-              v-else-if="article.kind === 'social' && article.socialUrl"
-              :href="article.socialUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              :class="[
-                'article-card__social-link',
-                article.socialPlatform === 'instagram'
-                  ? 'article-card__social-link--instagram'
-                  : article.socialPlatform === 'facebook'
-                    ? 'article-card__social-link--facebook'
-                    : '',
-              ]"
-            >
-              {{ socialCtaLabel }} · {{ getSocialPlatformLabel(article.socialPlatform) }}
-            </a>
-          </div>
-        </article>
-      </div>
-    </section>
-
     <section class="gallery-section">
       <div class="section-header">
         <div>
@@ -85,10 +25,26 @@
       </div>
 
       <div class="gallery-layout">
-        <div class="gallery-main-image" :style="{ backgroundImage: `url(${galleryMainImage})` }" />
-        <div class="gallery-stack">
-          <div v-for="photo in gallerySidePhotos" :key="photo.src" class="gallery-stack__item" :style="{ backgroundImage: `url(${photo.src})` }" />
+        <img
+          v-if="galleryPreviewPhotos[0]"
+          class="gallery-main-image"
+          :src="galleryPreviewPhotos[0].thumbnailSrc || galleryPreviewPhotos[0].src"
+          :alt="galleryPreviewPhotos[0].title || 'Beetle Club gallery highlight'"
+          loading="lazy"
+        />
+        <div v-if="galleryPreviewPhotos.length > 1" class="gallery-stack">
+          <img
+            v-for="photo in galleryPreviewPhotos.slice(1)"
+            :key="photo.src"
+            class="gallery-stack__item"
+            :src="photo.thumbnailSrc || photo.src"
+            :alt="photo.title || 'Beetle Club gallery photo'"
+            loading="lazy"
+          />
         </div>
+        <p v-if="!galleryLoading && !galleryPreviewPhotos.length" class="gallery-empty">
+          {{ currentLanguageCode === 'mkd' ? 'Нема достапни фотографии.' : 'Gallery photos are temporarily unavailable.' }}
+        </p>
       </div>
     </section>
 
@@ -101,25 +57,11 @@
       </div>
 
       <div class="timeline">
-        <article class="timeline-item">
-          <span class="timeline-item__year">2001</span>
+        <article v-for="item in content.home.heritage.timeline" :key="item.year" class="timeline-item">
+          <span class="timeline-item__year">{{ item.year }}</span>
           <div class="timeline-item__content">
-            <h3>The beginning</h3>
-            <p>Our story starts with the love for the air-cooled classic, the community around it and the rituals of the drive.</p>
-          </div>
-        </article>
-        <article class="timeline-item">
-          <span class="timeline-item__year">2016</span>
-          <div class="timeline-item__content">
-            <h3>Shared identity</h3>
-            <p>The club began to grow through regular meetups, restoration stories and a shared passion for bringing old machines back to life.</p>
-          </div>
-        </article>
-        <article class="timeline-item">
-          <span class="timeline-item__year">2026</span>
-          <div class="timeline-item__content">
-            <h3>Today</h3>
-            <p>From casual weekend cruises to community gatherings, we keep the Beetle spirit alive in the heart of Macedonia.</p>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.body }}</p>
           </div>
         </article>
       </div>
@@ -145,7 +87,12 @@
       </div>
 
       <div class="sponsors-row">
-        <div v-for="partner in pastSponsors" :key="`past-${partner.name}`" class="sponsor-logo">
+        <div
+          v-for="partner in pastSponsors"
+          :key="`past-${partner.name}`"
+          class="sponsor-logo"
+          :class="{ 'sponsor-logo--small': partner.name === 'Victorius' }"
+        >
           <img :src="partner.logo" :alt="partner.name" />
         </div>
       </div>
@@ -182,9 +129,12 @@
               <textarea v-model="form.description" rows="4" required></textarea>
             </label>
 
+            <p v-if="submitStatus === 'success'" class="join-form-message join-form-message--success" role="status">{{ content.home.joinModal.success }}</p>
+            <p v-if="submitStatus === 'error'" class="join-form-message join-form-message--error" role="alert">{{ content.home.joinModal.error }}</p>
+
             <div class="join-form-actions">
               <button class="button button--secondary" type="button" @click="closeJoinForm">{{ content.home.joinModal.cancel }}</button>
-              <button class="button button--primary" type="submit">{{ content.home.joinModal.submit }}</button>
+              <button class="button button--primary" type="submit" :disabled="isSubmitting || submitStatus === 'success'">{{ isSubmitting ? content.home.joinModal.sending : content.home.joinModal.submit }}</button>
             </div>
           </form>
         </div>
@@ -194,27 +144,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
-import type { ArticleSocialPlatform } from '../data_to_features/articles'
-import { getArticlesForLanguage, getArticlesPageCopy } from '../data_to_features/articles'
-import { galleryAlbums } from '../data_to_features/gallery'
-import { currentLanguageCode, currentTranslation } from '../data_to_features/translations_state_change'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue'
+
+import {
+  getGalleryAlbums,
+  getGalleryPhotos,
+  type GalleryPhoto,
+} from '../services_and_configuratables/gallery'
+
+import {
+  currentLanguageCode,
+  currentTranslation,
+} from '../services_and_configuratables/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
+
+/* -------------------------------------------------------------------------- */
+/* Partners                                                                   */
+/* -------------------------------------------------------------------------- */
 
 const sponsorAssets = Object.entries(
   import.meta.glob('../assets/sponsors/*.{png,jpg,jpeg,webp,svg}', {
     eager: true,
     import: 'default',
   }),
-
-// code for partners 
-
-
 )
   .sort(([leftPath], [rightPath]) => leftPath.localeCompare(rightPath))
   .map(([path, logo]) => {
-    const fileName = path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'Sponsor'
+    const fileName =
+      path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'Sponsor'
+
     const fallbackName = fileName
       .split(/[_-]+/)
       .filter(Boolean)
@@ -228,7 +195,9 @@ const sponsorAssets = Object.entries(
   })
 
 const sponsors = computed(() => {
-  const partnerNames = ((currentTranslation.value.home?.partners?.items as string[]) ?? []).filter(Boolean)
+  const partnerNames =
+    ((currentTranslation.value.home?.partners?.items as string[]) ?? [])
+      .filter(Boolean)
 
   return sponsorAssets.map((asset, index) => ({
     name: partnerNames[index] ?? asset.fallbackName,
@@ -244,7 +213,9 @@ const pastPartnerAssets = Object.entries(
 )
   .sort(([leftPath], [rightPath]) => leftPath.localeCompare(rightPath))
   .map(([path, logo]) => {
-    const fileName = path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'Past Partner'
+    const fileName =
+      path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'Past Partner'
+
     const fallbackName = fileName
       .split(/[_-]+/)
       .filter(Boolean)
@@ -275,87 +246,58 @@ const pastPartnersCopy = computed(() =>
         title: 'Old partners',
       },
 )
-const galleryAlbum = computed(() => {
-  if (!galleryAlbums.length) {
-    return undefined
+
+/* -------------------------------------------------------------------------- */
+/* Gallery - Cloudinary API                                                   */
+/* -------------------------------------------------------------------------- */
+
+const galleryPreviewPhotos = ref<GalleryPhoto[]>([])
+const galleryLoading = ref(false)
+
+const loadGalleryPreview = async () => {
+  galleryLoading.value = true
+
+  try {
+    const albums = await getGalleryAlbums()
+    const previews = await Promise.all(
+      albums.slice(0, 4).map(async (album) => {
+        const result = await getGalleryPhotos(album.folder)
+        return result.photos.slice(0, 2)
+      }),
+    )
+
+    galleryPreviewPhotos.value = previews.flat().slice(0, 5)
+  } catch (error) {
+    console.error('Could not load gallery preview:', error)
+    galleryPreviewPhotos.value = []
+  } finally {
+    galleryLoading.value = false
   }
-
-  return galleryAlbums[Math.floor(Math.random() * galleryAlbums.length)] ?? galleryAlbums[0]
-})
-
-const heroImage = computed(() => 'https://res.cloudinary.com/rjugb9ky/image/upload/v1785365298/DSC06171_ne1v7q.jpg')
-const storyImage = computed(() => 'https://res.cloudinary.com/rjugb9ky/image/upload/v1785365298/DSC06171_ne1v7q.jpg')
-const galleryMainImage = computed(() => {
-  const photos = galleryAlbum.value?.photos ?? []
-
-  if (!photos.length) {
-    return heroImage.value
-  }
-
-  const mainIndex = Math.floor(Math.random() * photos.length)
-  return photos[mainIndex]?.src ?? heroImage.value
-})
-const gallerySidePhotos = computed(() => {
-  const photos = [...(galleryAlbum.value?.photos ?? [])]
-
-  if (!photos.length) {
-    return []
-  }
-
-  const mainPhoto = galleryMainImage.value
-  const shuffled = photos
-    .filter((photo) => photo.src !== mainPhoto)
-    .sort(() => Math.random() - 0.5)
-
-  return shuffled.slice(0, 4)
-})
-
-const articlePageCopy = computed(() => getArticlesPageCopy(currentLanguageCode.value))
-
-const featuredArticles = computed(() =>
-  [...getArticlesForLanguage(currentLanguageCode.value)].sort(
-    (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime(),
-  ).slice(0, 3),
-)
-
-const normalizeYoutubeEmbed = (value: string) => {
-  if (!value.includes('youtube.com/watch?v=')) {
-    return value
-  }
-
-  const embedUrl = value.replace('watch?v=', 'embed/')
-  return embedUrl.split('&')[0]
 }
 
-const formatArticleDate = (value: string) =>
-  new Date(value).toLocaleDateString(currentLanguageCode.value === 'mkd' ? 'mk-MK' : 'en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+onMounted(() => {
+  void loadGalleryPreview()
+})
 
-const socialCtaLabel = computed(() =>
-  currentLanguageCode.value === 'mkd' ? 'Отвори објава' : 'Open post',
+/* -------------------------------------------------------------------------- */
+/* Home images                                                                */
+/* -------------------------------------------------------------------------- */
+
+const storyImage = computed(
+  () =>
+    'https://res.cloudinary.com/rjugb9ky/image/upload/v1785365298/DSC06171_ne1v7q.jpg',
 )
 
-const getSocialPlatformLabel = (platform?: ArticleSocialPlatform) => {
-  if (platform === 'instagram') {
-    return 'Instagram'
-  }
-
-  if (platform === 'facebook') {
-    return 'Facebook'
-  }
-
-  return currentLanguageCode.value === 'mkd' ? 'Социјална мрежа' : 'Social'
-}
-
-
+/* -------------------------------------------------------------------------- */
+/* Join form                                                                  */
+/* -------------------------------------------------------------------------- */
 
 const isJoinFormOpen = ref(false)
+
 const joinOverlayRef = ref<HTMLElement | null>(null)
 const joinModalRef = ref<HTMLElement | null>(null)
 const firstJoinFieldRef = ref<HTMLInputElement | null>(null)
+
 const form = reactive({
   name: '',
   surname: '',
@@ -363,7 +305,11 @@ const form = reactive({
   description: '',
 })
 
+const isSubmitting = ref(false)
+const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
+
 const openJoinForm = () => {
+  submitStatus.value = 'idle'
   isJoinFormOpen.value = true
 }
 
@@ -383,9 +329,19 @@ watch(isJoinFormOpen, async (isOpen) => {
     document.body.style.overflow = 'hidden'
 
     await nextTick()
-    joinOverlayRef.value?.scrollTo({ top: 0, behavior: 'smooth' })
-    joinModalRef.value?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+
+    joinOverlayRef.value?.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+
+    joinModalRef.value?.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth',
+    })
+
     firstJoinFieldRef.value?.focus()
+
     return
   }
 
@@ -398,20 +354,37 @@ onBeforeUnmount(() => {
   }
 })
 
-const submitJoinRequest = () => {
-  const subject = `Membership request from ${form.name} ${form.surname}`
-  const body = [
-    `Name: ${form.name}`,
-    `Surname: ${form.surname}`,
-    `Email: ${form.email}`,
-    '',
-    `Description: ${form.description}`,
-  ].join('\n')
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
-  const mailtoLink = `mailto:dukisofronievski@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+const submitJoinRequest = async () => {
+  if (isSubmitting.value) {
+    return
+  }
 
-  window.location.href = mailtoLink
-  closeJoinForm()
+  isSubmitting.value = true
+  submitStatus.value = 'idle'
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...form }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`)
+    }
+
+    submitStatus.value = 'success'
+    form.name = ''
+    form.surname = ''
+    form.email = ''
+    form.description = ''
+  } catch {
+    submitStatus.value = 'error'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -627,6 +600,16 @@ const submitJoinRequest = () => {
   box-shadow: 0 12px 28px rgba(125, 30, 30, 0.22);
 }
 
+.join-form-actions .button--primary {
+  background-image: none;
+  background-color: #7d1e1e;
+}
+
+.join-form-actions .button--primary:focus-visible {
+  outline: 3px solid #c89c44;
+  outline-offset: 3px;
+}
+
 .button--secondary {
   background: rgba(255, 255, 255, 0.08);
   color: #1a1c22;
@@ -699,153 +682,9 @@ const submitJoinRequest = () => {
   color: #3b3f47;
 }
 
-.articles-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.article-card {
-  display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  gap: 1rem;
-  padding: 1.1rem 0 0;
-  border-top: 1px solid rgba(26, 28, 34, 0.12);
-  color: #1a1c22;
-}
-
-.article-card:first-child {
-  border-top: none;
-  padding-top: 0;
-}
-
-.article-card__meta {
-  display: grid;
-  align-content: start;
-  gap: 0.45rem;
-}
-
-.article-card__dot {
-  width: 0.64rem;
-  height: 0.64rem;
-  border-radius: 50%;
-  background: #8c2f2f;
-  box-shadow: 0 0 0 5px rgba(140, 47, 47, 0.12);
-}
-
-.article-card__date {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #000000;
-}
-
-.article-card__tag {
-  display: inline-flex;
-  width: fit-content;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.26rem 0.5rem;
-  border-radius: 999px;
-  background: rgba(125, 30, 30, 0.08);
-  color: #7d1e1e;
-}
-
-.article-card__body h3 {
-  margin: 0;
-  font-size: clamp(1.18rem, 2.5vw, 1.6rem);
-  color: #1a1c22;
-}
-
-.article-card__body {
-  display: grid;
-  gap: 0.7rem;
-}
-
-.article-card__body p {
-  margin: 0;
-  color: #3b3f47;
-  line-height: 1.75;
-}
-
-.article-card__media,
-.article-card__video-wrap {
-  margin-top: 0;
-  border-radius: 0.9rem;
-  border: 1px solid rgba(26, 28, 34, 0.1);
-  overflow: hidden;
-  width: 100%;
-}
-
-.article-card__media {
-  display: block;
-  max-height: 420px;
-  object-fit: cover;
-}
-
-.article-card__video-wrap {
-  position: relative;
-  padding-top: 56.25%;
-}
-
-.article-card__video-wrap iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-.article-card__social-link {
-  width: fit-content;
-  margin-top: 0.1rem;
-  font-size: 0.74rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: #2c100f;
-  text-decoration: none;
-  background: rgba(233, 187, 84, 0.45);
-  border: 1px solid rgba(44, 16, 15, 0.2);
-  border-radius: 999px;
-  padding: 0.45rem 0.8rem;
-}
-
-.article-card__social-link:hover {
-  background: rgba(233, 187, 84, 0.7);
-}
-
-.article-card__social-link--instagram {
-  color: #fff4d1;
-  background: linear-gradient(135deg, #651f88 0%, #8a33b1 58%, #d8a940 100%);
-  border-color: rgba(216, 169, 64, 0.58);
-}
-
-.article-card__social-link--instagram:hover {
-  background: linear-gradient(135deg, #5a1979 0%, #7e2aa8 58%, #c8952f 100%);
-}
-
-.article-card__social-link--facebook {
-  color: #f8fbff;
-  background: #1f58d4;
-  border-color: rgba(17, 48, 116, 0.45);
-}
-
-.article-card__social-link--facebook:hover {
-  background: #1a4ab4;
-}
-
 .card-link {
   display: inline-block;
   margin-top: 1rem;
-}
-
-@media (max-width: 780px) {
-  .article-card {
-    grid-template-columns: 1fr;
-  }
 }
 
 .gallery-layout {
@@ -855,10 +694,11 @@ const submitJoinRequest = () => {
 }
 
 .gallery-main-image {
-  min-height: 520px;
+  width: 100%;
+  aspect-ratio: 4 / 3;
   border-radius: 1.5rem;
-  background-size: cover;
-  background-position: center;
+  object-fit: cover;
+  object-position: center;
   box-shadow: 0 22px 50px rgba(17, 13, 9, 0.09);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -870,11 +710,18 @@ const submitJoinRequest = () => {
 }
 
 .gallery-stack__item {
-  min-height: 250px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 1.2rem;
-  background-size: cover;
-  background-position: center;
+  object-fit: cover;
+  object-position: center;
   box-shadow: 0 18px 40px rgba(17, 13, 9, 0.09);
+}
+
+.gallery-empty {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  text-align: center;
 }
 
 .timeline {
@@ -1102,6 +949,23 @@ const submitJoinRequest = () => {
   min-height: 110px;
 }
 
+.join-form-message {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.join-form-message--success {
+  background: #e6f6ea;
+  color: #1e6b34;
+}
+
+.join-form-message--error {
+  background: #fdeaea;
+  color: #a12626;
+}
+
 .join-form-actions {
   display: flex;
   justify-content: flex-end;
@@ -1164,4 +1028,3 @@ const submitJoinRequest = () => {
   }
 }
 </style>
-

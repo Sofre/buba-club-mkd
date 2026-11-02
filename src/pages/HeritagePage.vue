@@ -25,8 +25,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { heritagePageData } from '../data_to_features/heritage'
-import { currentTranslation } from '../data_to_features/translations_state_change'
+import { heritagePageDataByLanguage } from '../services_and_configuratables/heritage'
+import {
+  currentLanguageCode,
+  currentTranslation,
+} from '../services_and_configuratables/translations_state_change'
+
+const heritagePageData = computed(() => heritagePageDataByLanguage[currentLanguageCode.value])
 
 const content = computed(() => currentTranslation.value ?? {
   home: {
@@ -45,7 +50,7 @@ const content = computed(() => currentTranslation.value ?? {
   },
 })
 
-const heritageTimeline = computed(() => heritagePageData.timeline)
+const heritageTimeline = computed(() => heritagePageData.value.timeline)
 </script>
 
 <style scoped>

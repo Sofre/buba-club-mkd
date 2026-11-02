@@ -21,7 +21,6 @@
       "nav": {
         "home": "Home",
         "heritage": "Heritage",
-        "news": "Articles",
         "events": "Events",
         "gallery": "Gallery"
       },
@@ -35,7 +34,16 @@
     "components": {
       "beetleModel": {
         "title": "Passion, heritage and community in one motion",
-        "alt": "The Beetle in Motion"
+        "alt": "The Beetle in Motion",
+        "label": "Volkswagen · 1968",
+        "interactive": "360° Interactive model",
+        "hintLocked": "Unlock to drag and rotate",
+        "hintUnlocked": "Drag to rotate · Scroll to zoom",
+        "unlock": "Unlock",
+        "lock": "Lock",
+        "reset": "Reset view",
+        "unlockAria": "Unlock model controls",
+        "lockAria": "Lock model controls"
       },
       "photoShowcase": {
         "fallbackTitle": "Image unavailable",
@@ -103,7 +111,24 @@
       "heritage": {
         "title": "Heritage",
         "body": "Beetle Club Macedonia is dedicated to preserving the history, heritage, and spirit of the iconic Volkswagen Beetle. United by a shared passion for classic automobiles, our members celebrate the timeless design, craftsmanship, and community that have made the Beetle a beloved symbol across generations.",
-        "cta": "Want to learn more? Visit our Heritage page to discover the history of Beetle Club Macedonia, our journey, memorable milestones, and the legacy we continue to build together."
+        "cta": "Want to learn more? Visit our Heritage page to discover the history of Beetle Club Macedonia, our journey, memorable milestones, and the legacy we continue to build together.",
+        "timeline": [
+          {
+            "year": "2001",
+            "title": "The beginning",
+            "body": "Our story starts with the love for the air-cooled classic, the community around it and the rituals of the drive."
+          },
+          {
+            "year": "2016",
+            "title": "Shared identity",
+            "body": "The club began to grow through regular meetups, restoration stories and a shared passion for bringing old machines back to life."
+          },
+          {
+            "year": "2026",
+            "title": "Today",
+            "body": "From casual weekend cruises to community gatherings, we keep the Beetle spirit alive in the heart of Macedonia."
+          }
+        ]
       },
       "cards": {
         "member": {
@@ -149,7 +174,10 @@
         "description": "Description",
         "close": "Close join form",
         "cancel": "Cancel",
-        "submit": "Send request"
+        "submit": "Send request",
+        "sending": "Sending...",
+        "success": "Thank you! Your request was sent successfully.",
+        "error": "Something went wrong. Your request was not sent, please try again."
       }
     }
   },
@@ -175,7 +203,6 @@
       "nav": {
         "home": "Дома",
         "heritage": "Наследство",
-        "news": "Артикли",
         "events": "Настани",
         "gallery": "Галерија"
       },
@@ -190,7 +217,16 @@
     "components": {
       "beetleModel": {
         "title": "Страст, наследство и заедница во едно движење",
-        "alt": "Бубата во движење"
+        "alt": "Бубата во движење",
+        "label": "Volkswagen · 1968",
+        "interactive": "360° Интерактивен модел",
+        "hintLocked": "Отклучи за да ротираш",
+        "hintUnlocked": "Влечи за ротација · Скролај за зум",
+        "unlock": "Отклучи",
+        "lock": "Заклучи",
+        "reset": "Ресетирај поглед",
+        "unlockAria": "Отклучи ги контролите на моделот",
+        "lockAria": "Заклучи ги контролите на моделот"
       },
       "photoShowcase": {
         "fallbackTitle": "Сликата не е достапна",
@@ -257,7 +293,24 @@
       "heritage": {
         "title": "Наследство",
         "body": "Буба Клуб Македонија е посветен на зачувување на историјата, наследството и духот на легендарниот Волксваген Буба. Се обединуваат со заедничка страст за класични автомобили, а нашите членови ја слават вечната дизајнерска естетика, занаетчиството и заедницата кои ја направија Бубата омилена симбол низ генерациите.",
-        "cta": "Сакате да дознаете повеќе? Посетете ја нашата страница за наследство за да ги откриете историјата на Буба Клуб Македонија, нашето патување, запаметливите моменти и наследството кое продолжуваме да го градиме заедно."
+        "cta": "Сакате да дознаете повеќе? Посетете ја нашата страница за наследство за да ги откриете историјата на Буба Клуб Македонија, нашето патување, запаметливите моменти и наследството кое продолжуваме да го градиме заедно.",
+        "timeline": [
+          {
+            "year": "2001",
+            "title": "Почетокот",
+            "body": "Нашата приказна започнува со љубовта кон воздушно ладениот класик, заедницата околу него и ритуалите на возењето."
+          },
+          {
+            "year": "2016",
+            "title": "Заеднички идентитет",
+            "body": "Клубот почна да расте преку редовни средби, приказни за реставрација и заедничка страст за враќање на старите машини во живот."
+          },
+          {
+            "year": "2026",
+            "title": "Денес",
+            "body": "Од опуштени викенд патувања до дружења на заедницата, го одржуваме духот на Бубата жив во срцето на Македонија."
+          }
+        ]
       },
       "cards": {
         "member": {
@@ -303,7 +356,10 @@
         "description": "Опис",
         "close": "Затвори го формуларот",
         "cancel": "Откажи",
-        "submit": "Испрати барање"
+        "submit": "Испрати барање",
+        "sending": "Се испраќа...",
+        "success": "Ви благодариме! Вашето барање е успешно испратено.",
+        "error": "Настана грешка. Барањето не е испратено, обидете се повторно."
       }
     }
   }

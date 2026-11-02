@@ -4,8 +4,6 @@
     { "source": "/events", "destination": "/index.html" },
     { "source": "/gallery", "destination": "/index.html" },
     { "source": "/heritage", "destination": "/index.html" },
-    { "source": "/articles", "destination": "/index.html" },
-    { "source": "/news", "destination": "/index.html" },
     { "source": "/beetle", "destination": "/index.html" }
   ]
 }

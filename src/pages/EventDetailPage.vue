@@ -24,8 +24,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { events } from '../data_to_features/events'
-import { currentTranslation } from '../data_to_features/translations_state_change'
+import { events } from '../services_and_configuratables/events'
+import { currentTranslation } from '../services_and_configuratables/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
 const route = useRoute()

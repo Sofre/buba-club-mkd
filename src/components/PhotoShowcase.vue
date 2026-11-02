@@ -27,8 +27,8 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { type GalleryPhoto } from '../data_to_features/gallery'
-import { currentTranslation } from '../data_to_features/translations_state_change'
+import { type GalleryPhoto } from '../services_and_configuratables/gallery'
+import { currentTranslation } from '../services_and_configuratables/translations_state_change'
 
 const props = defineProps<{ photo: GalleryPhoto }>()
 const content = computed(() => currentTranslation.value)

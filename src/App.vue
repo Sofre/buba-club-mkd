@@ -20,26 +20,11 @@
         <div class="dashboard-controls__vents" aria-hidden="true">
         </div>
 
-        <button
-          class="mobile-nav-toggle"
-          type="button"
-          :aria-expanded="isMobileNavOpen"
-          aria-controls="main-mobile-nav"
-          @click="toggleMobileNav"
-        >
-          <span class="mobile-nav-toggle__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-              <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 14 1.5h-4a.5.5 0 0 0-.49.42l-.36 2.54c-.58.22-1.12.53-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.61 8.98a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.4 1.04.72 1.63.94l.36 2.54a.5.5 0 0 0 .49.42h4a.5.5 0 0 0 .49-.42l.36-2.54c.58-.22 1.12-.53 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z" fill="currentColor"/>
-            </svg>
-          </span>
-          <span class="mobile-nav-toggle__label">DASH CONTROLS</span>
-          <span class="mobile-nav-toggle__hint">PUSH</span>
-        </button>
 
-        <nav id="main-mobile-nav" class="nav" :class="{ 'nav--mobile-open': isMobileNavOpen }" aria-label="Main navigation" @click="closeMobileNav">
+
+        <nav id="main-mobile-nav" class="nav" aria-label="Main navigation">
           <router-link to="/" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.home }}</router-link>
           <router-link to="/heritage" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.heritage }}</router-link>
-          <router-link to="/articles" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.news }}</router-link>
           <router-link to="/events" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.events }}</router-link>
           <router-link to="/gallery" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.gallery }}</router-link>
           <router-link to="/beetle" exact-active-class="nav-link--active" active-class="nav-link--active" aria-label="Beetle"><span class="nav-led" aria-hidden="true"></span></router-link>
@@ -74,16 +59,13 @@
         <button
           type="button"
           class="event-banner"
-          :class="{ 'event-banner--compact': !isEventBannerExpanded }"
-          :aria-label="currentContent.app.header.upcomingEventInfo"
-          :aria-expanded="isEventBannerExpanded"
+          :aria-label="`${currentContent.app.header.upcomingEventInfo}. ${eventBannerHint}`"
           @click="handleEventBannerClick"
         >
           <span class="event-banner__led" aria-hidden="true"></span>
           <span class="event-banner__screen">
             <span class="event-banner__label">{{ currentContent.app.header.nextMeet }}</span>
-            <span v-if="!isEventBannerExpanded" class="event-banner__compact-date">{{ formattedEventDate }}</span>
-            <span v-else :key="`flaps-${flapCycle}`" class="event-banner__flap-track">
+            <span :key="`flaps-${flapCycle}`" class="event-banner__flap-track">
               <span class="event-banner__flap">
                 <span class="event-banner__flap-label">{{ eventBannerFields.date }}</span>
                 <span class="event-banner__flap-value">{{ formattedEventDate }}</span>
@@ -101,6 +83,7 @@
                 <span class="event-banner__flap-value">{{ nextEvent.title || 'BEETLE CLUB MEET' }}</span>
               </span>
             </span>
+            <span class="event-banner__press-hint">{{ eventBannerHint }}</span>
           </span>
         </button>
       </section>
@@ -141,7 +124,6 @@
           <nav class="stamp-links">
             <router-link to="/">{{ currentContent.app.nav.home }}</router-link>
             <router-link to="/heritage">{{ currentContent.app.nav.heritage }}</router-link>
-            <router-link to="/articles">{{ currentContent.app.nav.news }}</router-link>
             <router-link to="/events">{{ currentContent.app.nav.events }}</router-link>
             <router-link to="/gallery">{{ currentContent.app.nav.gallery }}</router-link>
           </nav>
@@ -150,9 +132,17 @@
         <section class="stamp-module">
            <p class="stamp-label">{{ currentContent.home.socials.title }}</p>
            <ul class="stamp-list">
-            <li> <a class="stamp-link" href="mailto:dukisofronievski@gmail.com">Facebook</a></li>
-            <li> <a class="stamp-link" href="mailto:dukisofronievski@gmail.com">Instagram</a></li>
-            <li> <a class="stamp-link" href="mailto:dukisofronievski@gmail.com">X</a></li>
+            <li>
+              <a
+                class="stamp-link"
+                :href="socialProfiles.instagram"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Beetle Club Macedonia on Instagram (opens in a new tab)"
+              >
+                Instagram
+              </a>
+            </li>
           </ul>
         </section>
 
@@ -170,8 +160,9 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import bubaLogo from './assets/icons/bubalogo.jpg'
-import { events } from './data_to_features/events'
-import { currentLanguageCode, currentTranslation } from './data_to_features/translations_state_change'
+import { socialProfiles } from './services_and_configuratables/socials'
+import { events } from './services_and_configuratables/events'
+import { currentLanguageCode, currentTranslation } from './services_and_configuratables/translations_state_change'
 
 const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 const nextEvent = computed(() => sortedEvents.find((event) => new Date(event.date).getTime() >= Date.now()))
@@ -180,8 +171,6 @@ const isRouteReady = ref(false)
 const showSplash = ref(true)
 const isSplashLeaving = ref(false)
 const prefersReducedMotion = ref(false)
-const isEventBannerExpanded = ref(false)
-const isMobileNavOpen = ref(false)
 const flapCycle = ref(0)
 let flapInterval: number | null = null
 const currentContent = computed(() => currentTranslation.value)
@@ -200,6 +189,10 @@ const eventBannerFields = computed(() =>
         city: 'CITY',
         title: 'TITLE',
       },
+)
+
+const eventBannerHint = computed(() =>
+  currentLanguageCode.value === 'mkd' ? 'ПРИТИСНИ МЕ' : 'PRESS ME',
 )
 
 const footerLabels = computed(() =>
@@ -243,14 +236,6 @@ const formattedEventLocation = computed(() => {
 const router = useRouter()
 
 const handleEventBannerClick = () => {
-  if (!isEventBannerExpanded.value) {
-    isEventBannerExpanded.value = true
-    if (!prefersReducedMotion.value) {
-      triggerFlapAnimation()
-    }
-    return
-  }
-
   if (nextEvent.value?.id) {
     router.push(`/events/${nextEvent.value.id}`)
     return
@@ -261,14 +246,6 @@ const handleEventBannerClick = () => {
 
 const selectLanguage = (code: 'eng' | 'mkd') => {
   currentLanguageCode.value = code
-}
-
-const toggleMobileNav = () => {
-  isMobileNavOpen.value = !isMobileNavOpen.value
-}
-
-const closeMobileNav = () => {
-  isMobileNavOpen.value = false
 }
 
 const triggerFlapAnimation = () => {
@@ -293,13 +270,6 @@ watch(
     triggerFlapAnimation()
   },
   { immediate: true },
-)
-
-watch(
-  () => router.currentRoute.value.fullPath,
-  () => {
-    closeMobileNav()
-  },
 )
 
 onMounted(() => {
@@ -342,6 +312,17 @@ router.beforeEach(() => {
   min-height: 100vh;
   width: 100%;
   overflow: hidden;
+}
+
+.event-banner__press-hint {
+  justify-self: end;
+  color: #ff2a2a;
+  font-size: 0.62rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1.3;
+  text-transform: uppercase;
 }
 
 /* Plate + stamp footer */
@@ -659,15 +640,14 @@ router.beforeEach(() => {
   pointer-events: none;
 }
 
-.event-banner--compact {
-  width: min(100%, 440px);
-  margin-inline: auto;
-  padding: 0.8rem;
-}
-
 .event-banner:hover {
   transform: translateY(-1px);
   box-shadow: inset 0 0 0 4px #8f7d61, 0 24px 42px rgba(0, 0, 0, 0.2);
+}
+
+.event-banner:focus-visible {
+  outline: 3px solid #c89c44;
+  outline-offset: 4px;
 }
 
 .event-banner__screen {
@@ -761,28 +741,6 @@ router.beforeEach(() => {
   text-shadow:
     0.5px 0.5px 0 #8a7d67,
     0 1px 1px rgba(0, 0, 0, 0.15);
-}
-
-.event-banner__compact-date {
-  position: relative;
-  z-index: 1;
-
-  font-size: clamp(1.02rem, 1.3vw, 1.18rem);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-
-  color: #171a1d;
-
-  /* Vintage automotive/radio typography */
-  font-family: "Arial Narrow", "Roboto Condensed", "Trebuchet MS", sans-serif;
-
-  /* Slightly worn printed lettering */
-  text-shadow:
-    0.5px 0.5px 0 #8a7d67,
-    0 1px 1px rgba(0, 0, 0, 0.12);
-
-  opacity: 0.94;
 }
 
 .event-banner__flap-track {
@@ -955,6 +913,10 @@ router.beforeEach(() => {
 }
 
 @media (max-width: 600px) {
+  .event-banner__press-hint {
+    font-size: 0.56rem;
+  }
+
   .splash-screen-logo {
     width: min(62vw, 170px);
   }

@@ -1,111 +1,220 @@
+```vue
 <template>
   <section class="gallery-lab">
     <header class="gallery-lab__header">
       <p class="eyebrow">{{ content.pages.gallery.eyebrow }}</p>
+
       <h2>{{ content.pages.gallery.title }}</h2>
-      <p class="gallery-lab__lead">{{ galleryLead }}</p>
+
+      <p class="gallery-lab__lead">
+        {{ galleryLead }}
+      </p>
     </header>
 
-    <div class="folder-rail" role="tablist" aria-label="Gallery folders">
+    <!-- ALBUMS -->
+    <div
+      class="folder-rail"
+      role="tablist"
+      aria-label="Gallery folders"
+    >
       <button
         class="folder-chip"
-        :class="{ 'folder-chip--active': selectedAlbumId === null }"
+        :class="{
+          'folder-chip--active': selectedAlbumId === null,
+        }"
         type="button"
-        @click="selectedAlbumId = null"
+        @click="selectAlbum(null)"
       >
         {{ highlightsLabel }}
       </button>
 
       <button
-        v-for="album in galleryAlbumsWithUploads"
+        v-for="album in galleryAlbums"
         :key="album.id"
         class="folder-chip"
-        :class="{ 'folder-chip--active': selectedAlbumId === album.id }"
+        :class="{
+          'folder-chip--active':
+            selectedAlbumId === album.id,
+        }"
         type="button"
-        @click="selectedAlbumId = album.id"
+        @click="selectAlbum(album.id)"
       >
         <span>{{ album.title }}</span>
-        <small>{{ album.photos.length }}</small>
       </button>
     </div>
 
-    <section v-if="!selectedAlbum" class="highlights-panel">
-      <div v-if="stackedHighlightGroups.length" class="stacked-showcase-rail" aria-label="Featured gallery images">
-        <div v-for="(stack, stackIndex) in stackedHighlightGroups" :key="`stack-${stackIndex}`" class="stacked-showcase">
-          <span class="stacked-showcase__pin" aria-hidden="true"></span>
-          <figure
-            v-for="(photo, index) in stack"
-            :key="`${photo.albumId}-${photo.src}-${stackIndex}-${index}`"
-            class="stacked-showcase__item"
-            :style="stackStyle(stackIndex, index)"
-          >
-            <img :src="photo.thumbnailSrc || photo.src" :alt="photo.title || photo.albumTitle" loading="lazy" />
-          </figure>
-        </div>
-      </div>
+    <!-- HIGHLIGHTS -->
+    <section
+      v-if="!selectedAlbum"
+      class="highlights-panel"
+    >
+      <PhotoHighlights
+        v-if="randomHighlights.length"
+        :photos="randomHighlights"
+        :close-label="currentLanguageCode === 'mkd' ? 'Затвори' : 'Close'"
+        :prev-label="currentLanguageCode === 'mkd' ? 'Претходна' : 'Previous photo'"
+        :next-label="currentLanguageCode === 'mkd' ? 'Следна' : 'Next photo'"
+      />
 
-      <div v-if="randomHighlights.length" class="highlights-grid" aria-label="Gallery highlights">
-        <button
-          v-for="photo in randomHighlights"
-          :key="`${photo.albumId}-${photo.src}`"
-          class="highlight-item"
-          type="button"
-          @click="openAlbumFromHighlight(photo.albumId)"
-        >
-          <img :src="photo.thumbnailSrc || photo.src" :alt="photo.title || photo.albumTitle" loading="lazy" />
-          <span>{{ photo.albumTitle }}</span>
-        </button>
-      </div>
+      <p
+        v-if="
+          !loadingAlbums &&
+          !randomHighlights.length
+        "
+      >
+        {{
+          currentLanguageCode === 'mkd'
+            ? 'Нема достапни фотографии.'
+            : 'No photos available.'
+        }}
+      </p>
     </section>
 
-    <section v-else class="folder-view">
+    <!-- ALBUM -->
+    <section
+      v-else
+      class="folder-view"
+    >
       <div class="folder-view__meta">
-        <h3>{{ selectedAlbum.title }}</h3>
-        <p>{{ selectedAlbum.description }}</p>
-
+        <h3>
+          {{ selectedAlbum.title }}
+        </h3>
       </div>
 
-      <div class="folder-grid">
+      <div
+        v-if="loadingPhotos"
+        class="folder-view__loading"
+      >
+        {{
+          currentLanguageCode === 'mkd'
+            ? 'Се вчитуваат фотографии...'
+            : 'Loading photos...'
+        }}
+      </div>
+
+      <div
+        v-else-if="
+          !visibleAlbumPhotos.length
+        "
+        class="folder-view__empty"
+      >
+        {{
+          currentLanguageCode === 'mkd'
+            ? 'Нема фотографии во овој албум.'
+            : 'No photos in this album.'
+        }}
+      </div>
+
+      <div
+        v-else
+        class="folder-grid"
+      >
         <button
-          v-for="photo in visibleAlbumPhotos"
+          v-for="(
+            photo, index
+          ) in visibleAlbumPhotos"
           :key="`${selectedAlbum.id}-${photo.src}`"
           class="folder-photo"
           type="button"
-          @click="openViewer(selectedAlbum.photos.indexOf(photo))"
+          @click="openViewer(index)"
         >
-          <img :src="photo.thumbnailSrc || photo.src" :alt="photo.title || selectedAlbum.title" loading="lazy" />
+          <img
+            :src="
+              photo.thumbnailSrc ||
+              photo.src
+            "
+            :alt="
+              photo.title ||
+              selectedAlbum.title
+            "
+            loading="lazy"
+          />
         </button>
       </div>
 
-      <div v-if="hasMoreAlbumPhotos" ref="loadMoreSentinelRef" class="folder-view__load-more">
-        <button class="load-more-button" type="button" @click="loadMoreAlbumPhotos">
-          {{ currentLanguageCode === 'mkd' ? 'Вчитај повеќе' : 'Load more' }}
+      <div
+        v-if="hasMoreAlbumPhotos"
+        ref="loadMoreSentinelRef"
+        class="folder-view__load-more"
+      >
+        <button
+          class="load-more-button"
+          type="button"
+          :disabled="loadingMore"
+          @click="loadMoreAlbumPhotos"
+        >
+          {{
+            loadingMore
+              ? currentLanguageCode ===
+                'mkd'
+                ? 'Се вчитува...'
+                : 'Loading...'
+              : currentLanguageCode ===
+                'mkd'
+              ? 'Вчитај повеќе'
+              : 'Load more'
+          }}
         </button>
       </div>
     </section>
 
+    <!-- PHOTO VIEWER -->
     <teleport to="body">
-      <div v-if="viewerOpen && selectedAlbum && activePhoto" ref="viewerOverlayRef" class="photo-viewer" @click.self="closeViewer">
-        <div ref="viewerCardRef" class="photo-viewer__card">
-          <button class="photo-viewer__close" type="button" @click="closeViewer">×</button>
+      <div
+        v-if="
+          viewerOpen &&
+          selectedAlbum &&
+          activePhoto
+        "
+        ref="viewerOverlayRef"
+        class="photo-viewer"
+        @click.self="closeViewer"
+      >
+        <div
+          ref="viewerCardRef"
+          class="photo-viewer__card"
+        >
+          <button
+            class="photo-viewer__close"
+            type="button"
+            aria-label="Close"
+            @click="closeViewer"
+          >
+            ×
+          </button>
+
           <button
             class="photo-viewer__nav"
             type="button"
             @click="prevPhoto"
-            :aria-label="content.pages.gallery.prev"
+            :aria-label="
+              content.pages.gallery.prev
+            "
             :disabled="viewerIndex === 0"
           >
             ←
           </button>
 
-          <img class="photo-viewer__image" :src="activePhoto.src" :alt="activePhoto.title || selectedAlbum.title" />
+          <img
+            class="photo-viewer__image"
+            :src="activePhoto.src"
+            :alt="
+              activePhoto.title ||
+              selectedAlbum.title
+            "
+          />
 
           <button
             class="photo-viewer__nav"
             type="button"
             @click="nextPhoto"
-            :aria-label="content.pages.gallery.next"
-            :disabled="viewerIndex >= selectedAlbum.photos.length - 1"
+            :aria-label="
+              content.pages.gallery.next
+            "
+            :disabled="
+              viewerIndex >=
+              selectedAlbumPhotos.length - 1
+            "
           >
             →
           </button>
@@ -116,104 +225,279 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { fetchVercelBlobPhotos, getRandomGalleryHighlights } from '../data_to_features/gallery'
-import { currentLanguageCode, currentTranslation } from '../data_to_features/translations_state_change'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from 'vue'
 
-const content = computed(() => currentTranslation.value)
-const selectedAlbumId = ref<string | null>(null)
-const galleryAlbumsWithUploads = ref<Awaited<ReturnType<typeof fetchVercelBlobPhotos>>>([])
-const randomHighlights = ref<Awaited<ReturnType<typeof getRandomGalleryHighlights>>>([])
-const viewerOpen = ref(false)
-const viewerIndex = ref(0)
-const viewerOverlayRef = ref<HTMLElement | null>(null)
-const viewerCardRef = ref<HTMLElement | null>(null)
-const loadMoreSentinelRef = ref<HTMLElement | null>(null)
+import {
+  getGalleryAlbums,
+  getGalleryPhotos,
+  
+  type GalleryAlbum,
+  type GalleryPhoto,
+  type GalleryHighlightPhoto,
+} from '../services_and_configuratables/gallery'
+
+import {
+  currentLanguageCode,
+  currentTranslation,
+} from '../services_and_configuratables/translations_state_change'
+
+import PhotoHighlights from '../components/PhotoHighlights.vue'
+
+
+const logPhotoCount = (album: GalleryAlbum) => {
+  console.log(album.photos.length);
+  return album.photos.length;
+};
+
+const content = computed(
+  () => currentTranslation.value,
+)
+
+/* --------------------------------
+   STATE
+-------------------------------- */
+
+const selectedAlbumId =
+  ref<string | null>(null)
+
+const galleryAlbums =
+  ref<GalleryAlbum[]>([])
+
+const selectedAlbumPhotos =
+  ref<GalleryPhoto[]>([])
+
+const albumNextCursor =
+  ref<string | null>(null)
+
+const loadingAlbums =
+  ref(false)
+
+const loadingPhotos =
+  ref(false)
+
+const loadingMore =
+  ref(false)
+
+const randomHighlights =
+  ref<GalleryHighlightPhoto[]>([])
+
+const viewerOpen =
+  ref(false)
+
+const viewerIndex =
+  ref(0)
+
+const viewerOverlayRef =
+  ref<HTMLElement | null>(null)
+
+const viewerCardRef =
+  ref<HTMLElement | null>(null)
+
+const loadMoreSentinelRef =
+  ref<HTMLElement | null>(null)
+
 let previousBodyOverflow = ''
 
-const albumBatchSize = 6
-const albumVisibleCount = ref(albumBatchSize)
-let loadMoreObserver: IntersectionObserver | null = null
+let loadMoreObserver:
+  | IntersectionObserver
+  | null = null
 
-const stackedHighlightGroups = computed(() => {
-  const groups: typeof randomHighlights.value[] = []
+/* --------------------------------
+   COMPUTED
+-------------------------------- */
 
-  for (let index = 0; index < randomHighlights.value.length; index += 3) {
-    groups.push(randomHighlights.value.slice(index, index + 3))
-  }
+const selectedAlbum = computed(
+  () =>
+    selectedAlbumId.value
+      ? galleryAlbums.value.find(
+          (album) =>
+            album.id ===
+            selectedAlbumId.value,
+        ) ?? null
+      : null,
+)
 
-  return groups.slice(0, 4)
-})
+const visibleAlbumPhotos =
+  computed(
+    () =>
+      selectedAlbumPhotos.value,
+  )
 
-const stackStyle = (stackIndex: number, index: number) => {
-  const rotations = [
-    [-10, 8, -6],
-    [-8, 7, -5],
-    [-9, 6, -4],
-    [-7, 5, -3],
-  ]
-  const offsets = [
-    [0, 18, 34],
-    [0, 16, 32],
-    [0, 17, 33],
-    [0, 15, 30],
-  ]
+const hasMoreAlbumPhotos =
+  computed(
+    () =>
+      Boolean(
+        albumNextCursor.value,
+      ),
+  )
 
-  return {
-    transform: `translate(${offsets[stackIndex]?.[index] ?? 0}px, ${index * 10}px) rotate(${rotations[stackIndex]?.[index] ?? 0}deg)`,
-    zIndex: `${20 - index}`,
-  }
-}
+const activePhoto = computed(
+  () =>
+    selectedAlbumPhotos.value[
+      viewerIndex.value
+    ] ?? null,
+)
 
 const galleryLead = computed(() =>
-  currentLanguageCode.value === 'mkd'
-    ? 'Избери папка за да ги видиш сите фотографии. Ако нема избрана папка, ќе се прикажат случајни издвоени фотографии.'
-    : 'Select a folder to open all photos. If no folder is selected, random highlights are shown.',
+  currentLanguageCode.value ===
+  'mkd'
+    ? 'Избери папка за да ги видиш сите фотографии. Ако нема избрана папка, ќе се прикажат издвоени фотографии.'
+    : 'Select a folder to open all photos. If no folder is selected, featured photos are shown.',
 )
 
-const highlightsLabel = computed(() => (currentLanguageCode.value === 'mkd' ? 'Издвоени' : 'Highlights'))
-
-onMounted(async () => {
-  galleryAlbumsWithUploads.value = await fetchVercelBlobPhotos()
-  randomHighlights.value = await getRandomGalleryHighlights(12)
-})
-
-const selectedAlbum = computed(() =>
-  selectedAlbumId.value ? galleryAlbumsWithUploads.value.find((album) => album.id === selectedAlbumId.value) ?? null : null,
+const highlightsLabel = computed(
+  () =>
+    currentLanguageCode.value ===
+    'mkd'
+      ? 'Издвоени'
+      : 'Highlights',
 )
 
-const visibleAlbumPhotos = computed(() => selectedAlbum.value?.photos.slice(0, albumVisibleCount.value) ?? [])
-const hasMoreAlbumPhotos = computed(() => (selectedAlbum.value?.photos.length ?? 0) > albumVisibleCount.value)
+/* --------------------------------
+   LOAD ALBUMS
+-------------------------------- */
 
-const loadMoreAlbumPhotos = () => {
-  albumVisibleCount.value += albumBatchSize
+const loadAlbums = async () => {
+  loadingAlbums.value = true
+
+  try {
+    galleryAlbums.value =
+      await getGalleryAlbums()
+  } catch (error) {
+    console.error(
+      'Failed to load gallery albums:',
+      error,
+    )
+
+    galleryAlbums.value = []
+  } finally {
+    loadingAlbums.value = false
+  }
 }
 
-watch(selectedAlbum, () => {
-  albumVisibleCount.value = albumBatchSize
-})
+/* --------------------------------
+   LOAD ALBUM PHOTOS
+-------------------------------- */
 
-watch(loadMoreSentinelRef, async (sentinel) => {
-  loadMoreObserver?.disconnect()
-  if (!sentinel || typeof IntersectionObserver === 'undefined') return
+const loadAlbumPhotos = async (
+  album: GalleryAlbum,
+) => {
+  loadingPhotos.value = true
 
-  await nextTick()
-  loadMoreObserver = new IntersectionObserver(([entry]) => {
-    if (entry?.isIntersecting && hasMoreAlbumPhotos.value) loadMoreAlbumPhotos()
-  })
-  loadMoreObserver.observe(sentinel)
-})
+  selectedAlbumPhotos.value = []
+  albumNextCursor.value = null
+  viewerIndex.value = 0
 
-const activePhoto = computed(() => {
-  if (!selectedAlbum.value) return null
-  return selectedAlbum.value.photos[viewerIndex.value] ?? null
-})
+  try {
+    const result =
+      await getGalleryPhotos(
+        album.folder,
+      )
 
-const openAlbumFromHighlight = (albumId: string) => {
-  selectedAlbumId.value = albumId
+    selectedAlbumPhotos.value =
+      result.photos
+
+    albumNextCursor.value =
+      result.nextCursor
+  } catch (error) {
+    console.error(
+      'Failed to load album photos:',
+      error,
+    )
+
+    selectedAlbumPhotos.value = []
+    albumNextCursor.value = null
+  } finally {
+    loadingPhotos.value = false
+  }
 }
 
-const openViewer = (index: number) => {
+/* --------------------------------
+   LOAD MORE
+-------------------------------- */
+
+const loadMoreAlbumPhotos =
+  async () => {
+    if (
+      !selectedAlbum.value ||
+      !albumNextCursor.value ||
+      loadingMore.value
+    ) {
+      return
+    }
+
+    loadingMore.value = true
+
+    try {
+      const result =
+        await getGalleryPhotos(
+          selectedAlbum.value.folder,
+          albumNextCursor.value,
+        )
+        
+
+      selectedAlbumPhotos.value =
+        [
+          ...selectedAlbumPhotos.value,
+          ...result.photos,
+        ]
+
+      albumNextCursor.value =
+        result.nextCursor
+    } catch (error) {
+      console.error(
+        'Failed to load more gallery photos:',
+        error,
+      )
+    } finally {
+      loadingMore.value = false
+    }
+  }
+
+/* --------------------------------
+   SELECT ALBUM
+-------------------------------- */
+
+const selectAlbum = async (
+  albumId: string | null,
+) => {
+  selectedAlbumId.value =
+    albumId
+
+  if (!albumId) {
+    selectedAlbumPhotos.value = []
+    albumNextCursor.value = null
+    viewerOpen.value = false
+    return
+  }
+
+  const album =
+    galleryAlbums.value.find(
+      (item) =>
+        item.id === albumId,
+    )
+
+  if (!album) {
+    return
+  }
+
+  await loadAlbumPhotos(album)
+}
+
+/* --------------------------------
+   VIEWER
+-------------------------------- */
+
+const openViewer = (
+  index: number,
+) => {
   viewerIndex.value = index
   viewerOpen.value = true
 }
@@ -223,39 +507,170 @@ const closeViewer = () => {
 }
 
 const nextPhoto = () => {
-  if (!selectedAlbum.value) return
-  viewerIndex.value = Math.min(viewerIndex.value + 1, selectedAlbum.value.photos.length - 1)
+  if (
+    !selectedAlbum.value
+  ) {
+    return
+  }
+
+  viewerIndex.value =
+    Math.min(
+      viewerIndex.value + 1,
+      selectedAlbumPhotos.value
+        .length - 1,
+    )
 }
 
 const prevPhoto = () => {
-  viewerIndex.value = Math.max(viewerIndex.value - 1, 0)
+  viewerIndex.value =
+    Math.max(
+      viewerIndex.value - 1,
+      0,
+    )
 }
 
-watch(viewerOpen, async (isOpen) => {
-  if (typeof document === 'undefined') {
-    return
+/* --------------------------------
+   INITIAL LOAD
+-------------------------------- */
+
+onMounted(async () => {
+  await loadAlbums()
+
+  const highlights: GalleryHighlightPhoto[] =
+    []
+
+  for (const album of galleryAlbums.value) {
+    if (highlights.length >= 24) {
+      break
+    }
+
+    try {
+      const result =
+        await getGalleryPhotos(
+          album.folder,
+        )
+
+      for (const photo of result.photos.slice(0, 5)) {
+        highlights.push({
+          ...photo,
+          albumId: album.id,
+          albumTitle:
+            album.title,
+        })
+      }
+    } catch (error) {
+      console.error(
+        `Failed to load highlights for ${album.title}:`,
+        error,
+      )
+    }
   }
 
-  if (isOpen) {
-    previousBodyOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+  randomHighlights.value =
+    highlights
+})
+
+/* --------------------------------
+   INFINITE SCROLL
+-------------------------------- */
+
+watch(
+  loadMoreSentinelRef,
+  async (sentinel) => {
+    loadMoreObserver?.disconnect()
+
+    if (
+      !sentinel ||
+      typeof IntersectionObserver ===
+        'undefined'
+    ) {
+      return
+    }
 
     await nextTick()
-    viewerOverlayRef.value?.scrollTo({ top: 0, behavior: 'smooth' })
-    viewerCardRef.value?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-    return
-  }
 
-  document.body.style.overflow = previousBodyOverflow
-})
+    loadMoreObserver =
+      new IntersectionObserver(
+        ([entry]) => {
+          if (
+            entry?.isIntersecting &&
+            hasMoreAlbumPhotos.value
+          ) {
+            void loadMoreAlbumPhotos()
+          }
+        },
+        {
+          rootMargin: '300px',
+        },
+      )
+
+    loadMoreObserver.observe(
+      sentinel,
+    )
+  },
+)
+
+/* --------------------------------
+   BODY SCROLL LOCK
+-------------------------------- */
+
+watch(
+  viewerOpen,
+  async (isOpen) => {
+    if (
+      typeof document ===
+      'undefined'
+    ) {
+      return
+    }
+
+    if (isOpen) {
+      previousBodyOverflow =
+        document.body.style
+          .overflow
+
+      document.body.style.overflow =
+        'hidden'
+
+      await nextTick()
+
+      viewerOverlayRef.value?.scrollTo(
+        {
+          top: 0,
+          behavior: 'smooth',
+        },
+      )
+
+      viewerCardRef.value?.scrollIntoView(
+        {
+          block: 'center',
+          behavior: 'smooth',
+        },
+      )
+
+      return
+    }
+
+    document.body.style.overflow =
+      previousBodyOverflow
+  },
+)
+
+/* --------------------------------
+   CLEANUP
+-------------------------------- */
 
 onBeforeUnmount(() => {
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = previousBodyOverflow
+  if (
+    typeof document !==
+    'undefined'
+  ) {
+    document.body.style.overflow =
+      previousBodyOverflow
   }
+
   loadMoreObserver?.disconnect()
 })
-
 </script>
 
 <style scoped>
@@ -265,8 +680,6 @@ onBeforeUnmount(() => {
   gap: 1.2rem;
   padding: clamp(1.25rem, 3vw, 2.5rem);
   background: rgba(241, 237, 232, 0.97);
-  border: 1px solid rgba(23, 26, 29, 0);
-  box-shadow: 0 18px 40px rgba(17, 15, 13, 0);
   color: #171a1d;
   overflow: hidden;
 }
@@ -284,7 +697,7 @@ onBeforeUnmount(() => {
 .gallery-lab::after {
   content: '';
   position: absolute;
-  inset: 12px 12px 12px 12px;
+  inset: 12px;
   border: 1px solid rgba(23, 26, 29, 0.08);
   pointer-events: none;
 }
@@ -304,12 +717,11 @@ onBeforeUnmount(() => {
 }
 
 .eyebrow {
-  color: #045E9B;
+  color: #045e9b;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-
 
 .gallery-lab__header h2 {
   margin: 0;
@@ -323,13 +735,6 @@ onBeforeUnmount(() => {
   margin: 0;
   color: rgba(23, 26, 29, 0.8);
   line-height: 1.7;
-}
-
-.folder-rail {
-  display: flex;
-  gap: 0.7rem;
-  overflow-x: auto;
-  padding-bottom: 0.4rem;
 }
 
 .folder-rail {
@@ -353,7 +758,6 @@ onBeforeUnmount(() => {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 0.68rem;
-  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .folder-chip small {
@@ -373,120 +777,10 @@ onBeforeUnmount(() => {
   color: #f6f0e6;
 }
 
-.highlights-panel {
-  display: grid;
-  gap: 1rem;
-}
-
-.stacked-showcase-rail {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.stacked-showcase {
-  position: relative;
-  height: 270px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(23, 26, 29, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
-  overflow: hidden;
-}
-
-.stacked-showcase__pin {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  width: 18px;
-  height: 18px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff3c7 0%, #f3c96b 28%, #c78b1f 60%, #7d4f0d 100%);
-  border: 1px solid rgba(73, 43, 8, 0.35);
-  box-shadow: 0 2px 4px rgba(30, 18, 10, 0.22);
-  z-index: 6;
-}
-
-.stacked-showcase__pin::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 14px;
-  width: 4px;
-  height: 20px;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: linear-gradient(180deg, #9b6a16 0%, #5c3710 100%);
-  box-shadow: 0 2px 3px rgba(30, 18, 10, 0.2);
-}
-
-.stacked-showcase__pin::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 32px;
-  width: 10px;
-  height: 10px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: rgba(38, 24, 14, 0.16);
-  filter: blur(2px);
-}
-
-.stacked-showcase__item {
-  position: absolute;
-  top: 36px;
-  left: 12px;
-  width: min(180px, 40vw);
-  aspect-ratio: 4 / 3;
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid rgba(23, 26, 29, 0.18);
-  box-shadow: 0 12px 24px rgba(17, 15, 13, 0.08);
-}
-
-.stacked-showcase__item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.highlights-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.75rem;
-}
-
-.highlight-item {
-  border: 1px solid rgba(23, 26, 29, 0.12);
-  padding: 0;
-  background: rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-  text-align: left;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(17, 15, 13, 0.06);
-}
-
-.highlight-item img {
-  width: 100%;
-  height: 110px;
-  object-fit: cover;
-  display: block;
-}
-
-.highlight-item span {
-  display: block;
-  padding: 0.5rem 0.6rem 0.6rem;
-  color: #171a1d;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
+.highlights-panel,
 .folder-view {
   display: grid;
-  gap: 0.9rem;
+  gap: 1rem;
 }
 
 .folder-view__meta h3 {
@@ -498,15 +792,37 @@ onBeforeUnmount(() => {
 .folder-view__meta p {
   margin: 0.35rem 0 0;
   color: rgba(23, 26, 29, 0.8);
-  line-height: 1.7;
 }
 
-.upload-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+.folder-view__loading,
+.folder-view__empty {
+  padding: 2rem;
+  text-align: center;
+  color: rgba(23, 26, 29, 0.7);
+}
+
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(180px, 1fr)
+  );
   gap: 0.75rem;
-  margin-top: 0.9rem;
+}
+
+.folder-photo {
+  border: 1px solid rgba(23, 26, 29, 0.12);
+  overflow: hidden;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+}
+
+.folder-photo img {
+  width: 100%;
+  height: 175px;
+  object-fit: cover;
+  display: block;
 }
 
 .folder-view__load-more {
@@ -527,51 +843,9 @@ onBeforeUnmount(() => {
   font-size: 0.7rem;
 }
 
-.upload-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.7rem 1rem;
-  background: #171a1d;
-  color: #f6f0e6;
-  border: 1px solid rgba(23, 26, 29, 0.12);
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.upload-button input {
-  display: none;
-}
-
-.upload-error {
-  color: #8f1f1f;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.folder-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.75rem;
-}
-
-.folder-photo {
-  border: 1px solid rgba(23, 26, 29, 0.12);
-  overflow: hidden;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.18);
-  cursor: pointer;
-  box-shadow: 0 10px 22px rgba(17, 15, 13, 0.05);
-}
-
-.folder-photo img {
-  width: 100%;
-  height: 175px;
-  object-fit: cover;
-  display: block;
+.load-more-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
 }
 
 .photo-viewer {
@@ -607,7 +881,6 @@ onBeforeUnmount(() => {
   color: #171a1d;
   cursor: pointer;
   font-size: 1.15rem;
-  box-shadow: 0 10px 22px rgba(24, 26, 29, 0.24);
 }
 
 .photo-viewer__image {
@@ -627,19 +900,6 @@ onBeforeUnmount(() => {
   color: #171a1d;
   cursor: pointer;
   font-size: 1.1rem;
-  box-shadow: 0 10px 20px rgba(24, 26, 29, 0.18);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-}
-
-.photo-viewer__nav:hover:not(:disabled),
-.photo-viewer__close:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 24px rgba(24, 26, 29, 0.22);
-}
-
-.photo-viewer__nav:active:not(:disabled),
-.photo-viewer__close:active {
-  transform: translateY(0);
 }
 
 .photo-viewer__nav:disabled {
@@ -648,18 +908,6 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 720px) {
-  .stacked-showcase-rail {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .stacked-showcase {
-    height: 240px;
-  }
-
-  .stacked-showcase__item {
-    width: min(170px, 44vw);
-  }
-
   .photo-viewer__card {
     grid-template-columns: 1fr;
   }

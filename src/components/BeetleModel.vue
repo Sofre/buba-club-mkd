@@ -1,11 +1,17 @@
 <template>
   <section class="model-section">
-    <div class="model-header">
+    <header class="model-header">
+      <p class="model-label">{{ content.components.beetleModel.label }}</p>
       <h2>{{ content.components.beetleModel.title }}</h2>
-      
-    </div>
+      <p class="model-indicator">
+        <span class="model-indicator__dot" aria-hidden="true"></span>
+        {{ content.components.beetleModel.interactive }}
+      </p>
+    </header>
+
     <div class="model-frame">
       <model-viewer
+        ref="viewerRef"
         class="beetle-viewer"
         :src="modelUrl"
         :alt="content.components.beetleModel.alt"
@@ -21,80 +27,241 @@
         environment-image="neutral"
         exposure="1.1"
       />
+
+      <div class="model-controls">
+        <button
+          class="model-control"
+          type="button"
+          :aria-pressed="unlocked"
+          :aria-label="unlocked ? content.components.beetleModel.lockAria : content.components.beetleModel.unlockAria"
+          @click="unlocked = !unlocked"
+        >
+          {{ unlocked ? content.components.beetleModel.lock : content.components.beetleModel.unlock }}
+        </button>
+        <button
+          v-if="unlocked"
+          class="model-control"
+          type="button"
+          @click="resetView"
+        >
+          {{ content.components.beetleModel.reset }}
+        </button>
+      </div>
     </div>
+
+    <footer class="model-footer">
+      <span class="model-footer__rule" aria-hidden="true"></span>
+      <p class="model-hint">
+        {{ unlocked ? content.components.beetleModel.hintUnlocked : content.components.beetleModel.hintLocked }}
+      </p>
+      <span class="model-footer__rule" aria-hidden="true"></span>
+    </footer>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { currentTranslation } from '../data_to_features/translations_state_change'
+import { currentTranslation } from '../services_and_configuratables/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
 const modelUrl = new URL('../assets/3d/1968_volkswagen_beetle.glb', import.meta.url).href
 const unlocked = ref(false)
 
+const viewerRef = ref<HTMLElement | null>(null)
 
+const resetView = () => {
+  const viewer = viewerRef.value as (HTMLElement & {
+    cameraOrbit: string
+    fieldOfView: string
+    jumpCameraToGoal?: () => void
+  }) | null
+
+  if (!viewer) return
+
+  viewer.cameraOrbit = '-35deg 82deg 2.1m'
+  viewer.fieldOfView = '10deg'
+  viewer.jumpCameraToGoal?.()
+}
 </script>
 
 <style scoped>
 .model-section {
+  --charcoal: #171916;
+  --cream: #e8dfc9;
+  --gold: #b49a68;
+
+  display: grid;
+  gap: 1rem;
   padding: clamp(1.25rem, 3vw, 2.5rem);
-  background: #121212;
-  border: 2px solid #8d8d8d;
+  background: var(--charcoal);
+  color: var(--cream);
   border-radius: 0;
-  box-shadow: none;
+  outline: 1px solid rgba(180, 154, 104, 0.35);
+  outline-offset: -10px;
 }
 
 .model-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.85rem;
-  border-bottom: 1px solid #6b6b6b;
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  text-align: center;
+}
+
+.model-label,
+.model-indicator,
+.model-hint,
+.model-control {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.model-label {
+  margin: 0;
+  color: var(--gold);
 }
 
 .model-header h2 {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 1.05;
-  letter-spacing: -0.06em;
-  color: #f3f3f3;
+  max-width: 28ch;
+  font-family: Georgia, 'Palatino Linotype', 'Book Antiqua', serif;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.15;
+  letter-spacing: 0;
+  color: var(--cream);
 }
 
+.model-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  color: rgba(232, 223, 201, 0.6);
+}
 
+.model-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: model-pulse 2.4s ease-in-out infinite;
+}
 
 .model-frame {
   position: relative;
-  min-height: clamp(420px, 62vh, 720px);
   display: grid;
   place-items: center;
-  padding: 1rem;
-  border-radius: 0;
-  background: #151515;
-  border: 1px solid #7a7a7a;
-  overflow: hidden;
-  box-shadow: none;
+  min-height: clamp(380px, 58vh, 680px);
+  background: radial-gradient(
+    ellipse 55% 60% at 50% 52%,
+    rgba(232, 223, 201, 0.16) 0%,
+    rgba(180, 154, 104, 0.06) 45%,
+    transparent 72%
+  );
 }
 
 .beetle-viewer {
   display: block;
   width: min(100%, 1100px);
-  height: clamp(420px, 62vh, 700px);
+  height: clamp(380px, 58vh, 660px);
   border-radius: 0;
   background: transparent;
   filter: none;
+  --poster-color: transparent;
+}
+
+.model-controls {
+  position: absolute;
+  right: 0;
+  bottom: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.model-control {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(180, 154, 104, 0.55);
+  border-radius: 0;
+  background: rgba(23, 25, 22, 0.6);
+  color: var(--cream);
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.model-control:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--charcoal);
+}
+
+.model-control:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 2px;
+}
+
+.model-footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.model-footer__rule {
+  height: 1px;
+  background: rgba(180, 154, 104, 0.4);
+}
+
+.model-hint {
+  margin: 0;
+  color: rgba(232, 223, 201, 0.6);
+  text-align: center;
+}
+
+@keyframes model-pulse {
+  50% {
+    opacity: 0.35;
+  }
 }
 
 @media (max-width: 700px) {
-  .model-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .model-label,
+  .model-indicator,
+  .model-hint,
+  .model-control {
+    letter-spacing: 0.18em;
   }
 
-  .unlock-btn {
-    width: 100%;
+  .model-frame {
+    min-height: 340px;
+  }
+
+  .beetle-viewer {
+    height: 340px;
+  }
+
+  .model-controls {
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  .model-footer {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-top: 2.25rem;
+  }
+
+  .model-footer__rule {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .model-indicator__dot {
+    animation: none;
   }
 }
 </style>
