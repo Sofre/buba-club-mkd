@@ -110,15 +110,6 @@ const formattedDate = (value: string) => new Date(value).toLocaleString('en', {
   color: #181b1e;
 }
 
-.featured-event-card::before {
-  content: '';
-  position: absolute;
-  inset: 18px 18px 18px auto;
-  width: 28%;
-  background: rgba(32, 35, 39, 0.06);
-  border-left: 4px solid rgba(24, 27, 30, 0.52);
-}
-
 .featured-event-card h3 {
   margin: 0.4rem 0 0.6rem;
   font-size: clamp(1.6rem, 3vw, 2.4rem);

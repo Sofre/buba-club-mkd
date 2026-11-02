@@ -316,7 +316,7 @@ router.beforeEach(() => {
 
 .event-banner__press-hint {
   justify-self: end;
-  color: #ff2a2a;
+  color: #4f2f2b;
   font-size: 0.62rem;
   font-size: 0.62rem;
   font-weight: 800;
@@ -909,6 +909,18 @@ router.beforeEach(() => {
 
   .footer-plate__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 840px) {
+  .event-banner__flap-track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .event-banner__flap-value {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 }
 

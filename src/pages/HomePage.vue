@@ -21,7 +21,6 @@
           <p class="section-tag section-tag--muted">{{ content.home.gallery.title || 'club gallery' }}</p>
           <h2>{{ content.home.gallery.eyebrow || 'Club moments' }}</h2>
         </div>
-        <router-link class="inline-link" to="/gallery">Open gallery</router-link>
       </div>
 
       <div class="gallery-layout">
