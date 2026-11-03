@@ -129,8 +129,10 @@
               <textarea v-model="form.description" rows="4" required></textarea>
             </label>
 
+            <div ref="captchaRef" class="join-captcha"></div>
+
             <p v-if="submitStatus === 'success'" class="join-form-message join-form-message--success" role="status">{{ content.home.joinModal.success }}</p>
-            <p v-if="submitStatus === 'error'" class="join-form-message join-form-message--error" role="alert">{{ content.home.joinModal.error }}</p>
+            <p v-if="submitStatus === 'error'" class="join-form-message join-form-message--error" role="alert">{{ errorMessage }}</p>
 
             <div class="join-form-actions">
               <button class="button button--secondary" type="button" @click="closeJoinForm">{{ content.home.joinModal.cancel }}</button>
@@ -319,6 +321,89 @@ const form = reactive({
 
 const isSubmitting = ref(false)
 const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
+const errorMessage = ref('')
+
+/* Cloudflare Turnstile */
+type TurnstileApi = {
+  render: (el: HTMLElement, options: Record<string, unknown>) => string
+  reset: (id?: string) => void
+  remove: (id?: string) => void
+}
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined
+const captchaRef = ref<HTMLElement | null>(null)
+const captchaToken = ref('')
+let captchaWidgetId: string | undefined
+let turnstileScript: Promise<TurnstileApi> | null = null
+
+const loadTurnstile = () => {
+  turnstileScript ??= new Promise<TurnstileApi>((resolve, reject) => {
+    const existing = (window as unknown as { turnstile?: TurnstileApi }).turnstile
+    if (existing) {
+      resolve(existing)
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+    script.async = true
+    script.onload = () => resolve((window as unknown as { turnstile: TurnstileApi }).turnstile)
+    script.onerror = () => {
+      turnstileScript = null
+      reject(new Error('Could not load Turnstile'))
+    }
+    document.head.appendChild(script)
+  })
+
+  return turnstileScript
+}
+
+const renderCaptcha = async () => {
+  captchaToken.value = ''
+
+  if (!TURNSTILE_SITE_KEY || !captchaRef.value) {
+    return
+  }
+
+  try {
+    const turnstile = await loadTurnstile()
+    if (!captchaRef.value || !isJoinFormOpen.value) {
+      return
+    }
+
+    captchaWidgetId = turnstile.render(captchaRef.value, {
+      sitekey: TURNSTILE_SITE_KEY,
+      theme: 'light',
+      language: currentLanguageCode.value === 'mkd' ? 'mk' : 'en',
+      callback: (token: string) => {
+        captchaToken.value = token
+      },
+      'expired-callback': () => {
+        captchaToken.value = ''
+      },
+      'error-callback': () => {
+        captchaToken.value = ''
+      },
+    })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const removeCaptcha = () => {
+  if (captchaWidgetId !== undefined) {
+    ;(window as unknown as { turnstile?: TurnstileApi }).turnstile?.remove(captchaWidgetId)
+    captchaWidgetId = undefined
+  }
+  captchaToken.value = ''
+}
+
+const resetCaptcha = () => {
+  captchaToken.value = ''
+  if (captchaWidgetId !== undefined) {
+    ;(window as unknown as { turnstile?: TurnstileApi }).turnstile?.reset(captchaWidgetId)
+  }
+}
 
 const openJoinForm = () => {
   submitStatus.value = 'idle'
@@ -353,10 +438,12 @@ watch(isJoinFormOpen, async (isOpen) => {
     })
 
     firstJoinFieldRef.value?.focus()
+    void renderCaptcha()
 
     return
   }
 
+  removeCaptcha()
   document.body.style.overflow = previousBodyOverflow
 })
 
@@ -376,15 +463,22 @@ const submitJoinRequest = async () => {
   isSubmitting.value = true
   submitStatus.value = 'idle'
 
+  if (!captchaToken.value) {
+    errorMessage.value = content.value.home.joinModal.captchaRequired
+    submitStatus.value = 'error'
+    isSubmitting.value = false
+    return
+  }
+
   try {
     const response = await fetch(`${API_BASE_URL}/contact`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form }),
+      body: JSON.stringify({ ...form, captchaToken: captchaToken.value }),
     })
 
     if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`)
+      throw new Error(String(response.status))
     }
 
     submitStatus.value = 'success'
@@ -392,9 +486,15 @@ const submitJoinRequest = async () => {
     form.surname = ''
     form.email = ''
     form.description = ''
-  } catch {
+  } catch (error) {
+    const isCaptchaFailure = error instanceof Error && error.message === '403'
+    errorMessage.value = isCaptchaFailure
+      ? content.value.home.joinModal.captchaFailed
+      : content.value.home.joinModal.error
     submitStatus.value = 'error'
   } finally {
+    // Tokens are single-use, so always request a fresh one.
+    resetCaptcha()
     isSubmitting.value = false
   }
 }
@@ -976,6 +1076,10 @@ const submitJoinRequest = async () => {
 .join-form-message--error {
   background: #fdeaea;
   color: #a12626;
+}
+
+.join-captcha {
+  min-height: 0;
 }
 
 .join-form-actions {

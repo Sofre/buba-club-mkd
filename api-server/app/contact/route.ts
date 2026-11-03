@@ -42,6 +42,55 @@ export async function POST(request: Request) {
     )
   }
 
+  const token = clean(payload.captchaToken, 2048)
+  const secret = process.env.TURNSTILE_SECRET_KEY
+
+  if (!secret) {
+    console.error("TURNSTILE_SECRET_KEY is not configured")
+    return NextResponse.json(
+      { error: "Captcha not configured" },
+      { status: 500, headers: corsHeaders },
+    )
+  }
+
+  if (!token) {
+    return NextResponse.json(
+      { error: "Captcha required" },
+      { status: 400, headers: corsHeaders },
+    )
+  }
+
+  try {
+    const verification = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          secret,
+          response: token,
+          ...(request.headers.get("x-forwarded-for")
+            ? { remoteip: request.headers.get("x-forwarded-for")!.split(",")[0].trim() }
+            : {}),
+        }),
+      },
+    )
+    const result = (await verification.json()) as { success?: boolean }
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Captcha failed" },
+        { status: 403, headers: corsHeaders },
+      )
+    }
+  } catch (error) {
+    console.error("Captcha verification error:", error)
+    return NextResponse.json(
+      { error: "Captcha verification unavailable" },
+      { status: 502, headers: corsHeaders },
+    )
+  }
+
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CONTACT_TO } =
     process.env
 

@@ -177,7 +177,9 @@
         "submit": "Send request",
         "sending": "Sending...",
         "success": "Thank you! Your request was sent successfully.",
-        "error": "Something went wrong. Your request was not sent, please try again."
+        "error": "Something went wrong. Your request was not sent, please try again.",
+        "captchaRequired": "Please complete the verification before sending.",
+        "captchaFailed": "Verification failed. Please try again."
       }
     }
   },
@@ -359,7 +361,9 @@
         "submit": "Испрати барање",
         "sending": "Се испраќа...",
         "success": "Ви благодариме! Вашето барање е успешно испратено.",
-        "error": "Настана грешка. Барањето не е испратено, обидете се повторно."
+        "error": "Настана грешка. Барањето не е испратено, обидете се повторно.",
+        "captchaRequired": "Ве молиме завршете ја верификацијата пред да испратите.",
+        "captchaFailed": "Верификацијата не успеа. Обидете се повторно."
       }
     }
   }
