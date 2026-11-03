@@ -29,7 +29,8 @@
           class="gallery-main-image"
           :src="galleryPreviewPhotos[0].thumbnailSrc || galleryPreviewPhotos[0].src"
           :alt="galleryPreviewPhotos[0].title || 'Beetle Club gallery highlight'"
-          loading="lazy"
+          loading="eager"
+          fetchpriority="high"
         />
         <div v-if="galleryPreviewPhotos.length > 1" class="gallery-stack">
           <img
@@ -158,6 +159,7 @@ import {
   getGalleryPhotos,
   type GalleryPhoto,
 } from '../services_and_configuratables/gallery'
+import { markHomeReady } from '../services_and_configuratables/app_ready'
 
 import {
   currentLanguageCode,
@@ -266,11 +268,22 @@ const loadGalleryPreview = async () => {
     )
 
     galleryPreviewPhotos.value = previews.flat().slice(0, 5)
+
+    const first = galleryPreviewPhotos.value[0]
+    if (first) {
+      await new Promise<void>((resolve) => {
+        const img = new Image()
+        img.onload = () => resolve()
+        img.onerror = () => resolve()
+        img.src = first.thumbnailSrc || first.src
+      })
+    }
   } catch (error) {
     console.error('Could not load gallery preview:', error)
     galleryPreviewPhotos.value = []
   } finally {
     galleryLoading.value = false
+    markHomeReady()
   }
 }
 

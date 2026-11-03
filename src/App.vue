@@ -164,6 +164,11 @@ import { socialProfiles } from './services_and_configuratables/socials'
 import { events } from './services_and_configuratables/events'
 import { currentLanguageCode, currentTranslation } from './services_and_configuratables/translations_state_change'
 
+import { homeReady } from './services_and_configuratables/app_ready'
+
+const SPLASH_MIN_MS = 1200
+const SPLASH_MAX_MS = 5000
+
 const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 const nextEvent = computed(() => sortedEvents.find((event) => new Date(event.date).getTime() >= Date.now()))
 const isInitialLoad = ref(true)
@@ -276,14 +281,19 @@ onMounted(() => {
   prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   startFlapTicker()
 
-  window.setTimeout(() => {
+  const minDelay = new Promise<void>((resolve) => window.setTimeout(resolve, SPLASH_MIN_MS))
+  const maxDelay = new Promise<void>((resolve) => window.setTimeout(resolve, SPLASH_MAX_MS))
+  const fontsReady = document.fonts?.ready ?? Promise.resolve()
+  const pageReady = window.location.pathname === '/' ? homeReady : Promise.resolve()
+
+  void Promise.race([Promise.all([minDelay, fontsReady, pageReady]), maxDelay]).then(() => {
     isInitialLoad.value = false
     isSplashLeaving.value = true
 
     window.setTimeout(() => {
       showSplash.value = false
     }, 450)
-  }, 1800)
+  })
 })
 
 onBeforeUnmount(() => {
