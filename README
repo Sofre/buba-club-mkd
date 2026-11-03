@@ -32,7 +32,7 @@ The image system includes:
 
 This approach helps reduce initial page load times, bandwidth usage, and unnecessary requests while providing a smoother experience when browsing large collections of beetle images.
 
-## Architecture
+
 
 
 ## Architecture
@@ -60,18 +60,3 @@ A major goal of this approach is **cost optimization**. Instead of pulling large
 The architecture is intentionally minimal: **Vue 3 handles the user interface and gallery experience, NestJS provides the API and image-delivery layer, and Cloudy Object Storage handles the underlying image storage. Cloudy is also optimized on economic mode.**
 
 
-### Documentation in writing .. . 
-
-## Local environment and Vercel
-
-The Vue/Vite frontend reads `VITE_API_URL` from its root `.env.local`; locally it
-defaults to `http://localhost:3000`. Set it to the deployed API base URL in the
-Vercel frontend project's environment settings for Preview and Production.
-
-The Next.js API server reads `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`,
-`CLOUDINARY_API_SECRET`, and `CORS_ALLOWED_ORIGIN` from `api-server/.env.local`
-for local development. Configure those values in the API project's Vercel
-environment settings as server-only variables. `CORS_ALLOWED_ORIGIN` must be
-the exact frontend origin for the respective Preview or Production environment.
-Use `.env.example` and `api-server/.env.example` as variable-name references;
-never put real credentials in either example file or source control.
