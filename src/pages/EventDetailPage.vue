@@ -24,16 +24,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { events } from '../services_and_configuratables/events'
-import { currentTranslation } from '../services_and_configuratables/translations_state_change'
+import { events, getLocalizedEvent } from '../services_and_configuratables/events'
+import { currentLanguageCode, currentTranslation } from '../services_and_configuratables/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
 const route = useRoute()
-const event = computed(() => events.find((item) => item.id === route.params.id))
+const event = computed(() => {
+  const foundEvent = events.find((item) => item.id === route.params.id)
+  return foundEvent ? getLocalizedEvent(foundEvent, currentLanguageCode.value) : undefined
+})
 
 const formattedDate = computed(() => {
   if (!event.value) return ''
-  return new Date(event.value.date).toLocaleString('en', {
+  return new Date(event.value.date).toLocaleString(currentLanguageCode.value === 'mkd' ? 'mk' : 'en', {
     dateStyle: 'full',
     timeStyle: 'short',
   })

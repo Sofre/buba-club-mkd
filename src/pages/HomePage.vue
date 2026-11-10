@@ -11,7 +11,6 @@
           <li>{{ content.home.hero.storypoint2 }}</li>
           <li>{{ content.home.hero.storypoint3 }}</li>
         </ul>
-        <button class="button button--primary" type="button" @click="openJoinForm">{{ content.home.cards.member.button }}</button>
       </div>
     </section>
 
@@ -27,7 +26,7 @@
         <img
           v-if="galleryPreviewPhotos[0]"
           class="gallery-main-image"
-          :src="galleryPreviewPhotos[0].thumbnailSrc || galleryPreviewPhotos[0].src"
+          :src="galleryPreviewPhotos[0].originalSrc || galleryPreviewPhotos[0].src"
           :alt="galleryPreviewPhotos[0].title || 'Beetle Club gallery highlight'"
           loading="eager"
           fetchpriority="high"
@@ -37,7 +36,7 @@
             v-for="photo in galleryPreviewPhotos.slice(1)"
             :key="photo.src"
             class="gallery-stack__item"
-            :src="photo.thumbnailSrc || photo.src"
+            :src="photo.originalSrc || photo.src"
             :alt="photo.title || 'Beetle Club gallery photo'"
             loading="lazy"
           />
@@ -167,6 +166,7 @@ import {
   currentLanguageCode,
   currentTranslation,
 } from '../services_and_configuratables/translations_state_change'
+import storyPhoto from '../assets/buba-klub-rodenden-carclub-20.jpg'
 
 const content = computed(() => currentTranslation.value)
 
@@ -256,20 +256,45 @@ const pastPartnersCopy = computed(() =>
 
 const galleryPreviewPhotos = ref<GalleryPhoto[]>([])
 const galleryLoading = ref(false)
+const targetAlbumKeys = [
+  '13thbirthdaybeetleclub2023',
+  'internationalbeetleday27062021',
+]
+
+const normalizeAlbumName = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 const loadGalleryPreview = async () => {
   galleryLoading.value = true
 
   try {
     const albums = await getGalleryAlbums()
-    const previews = await Promise.all(
-      albums.slice(0, 4).map(async (album) => {
-        const result = await getGalleryPhotos(album.folder)
-        return result.photos.slice(0, 2)
-      }),
-    )
+    const targetAlbums = targetAlbumKeys.flatMap((albumKey) => {
+      const album = albums.find((item) =>
+        normalizeAlbumName(`${item.title} ${item.folder}`).includes(albumKey),
+      )
+      return album ? [album] : []
+    })
 
-    galleryPreviewPhotos.value = previews.flat().slice(0, 5)
+    if (!targetAlbums.length) {
+      galleryPreviewPhotos.value = []
+      return
+    }
+
+    const albumPhotos = await Promise.all(
+      targetAlbums.map((album) => getGalleryPhotos(album.folder)),
+    )
+    const randomizedPhotos = albumPhotos.flatMap(({ photos }) => photos)
+
+    for (let index = randomizedPhotos.length - 1; index > 0; index--) {
+      const randomIndex = Math.floor(Math.random() * (index + 1))
+      ;[randomizedPhotos[index], randomizedPhotos[randomIndex]] = [
+        randomizedPhotos[randomIndex],
+        randomizedPhotos[index],
+      ]
+    }
+
+    galleryPreviewPhotos.value = randomizedPhotos.slice(0, 5)
 
     const first = galleryPreviewPhotos.value[0]
     if (first) {
@@ -277,7 +302,7 @@ const loadGalleryPreview = async () => {
         const img = new Image()
         img.onload = () => resolve()
         img.onerror = () => resolve()
-        img.src = first.thumbnailSrc || first.src
+        img.src = first.originalSrc || first.src
       })
     }
   } catch (error) {
@@ -297,10 +322,7 @@ onMounted(() => {
 /* Home images                                                                */
 /* -------------------------------------------------------------------------- */
 
-const storyImage = computed(
-  () =>
-    'https://res.cloudinary.com/rjugb9ky/image/upload/v1785365298/DSC06171_ne1v7q.jpg',
-)
+const storyImage = computed(() => storyPhoto)
 
 /* -------------------------------------------------------------------------- */
 /* Join form                                                                  */
@@ -532,7 +554,7 @@ const submitJoinRequest = async () => {
 }
 
 .story-block__image {
-  min-height: 450px;
+  min-height: clamp(32rem, 40vw, 36rem);
   border-radius: 1.2rem;
   background-size: cover;
   background-position: center;
@@ -554,13 +576,13 @@ const submitJoinRequest = async () => {
 }
 
 .story-block__content > h2 + p {
-  margin-top: 0.85rem;
+  margin-top: 1.35rem;
 }
 
 .story-points {
   list-style: none;
   padding: 0;
-  margin: 1.5rem 0 2rem;
+  margin: 2rem 0 2rem;
   display: grid;
   gap: 0.85rem;
 }
@@ -1095,6 +1117,10 @@ const submitJoinRequest = async () => {
     grid-template-columns: 1fr;
   }
 
+  .story-block__image {
+    min-height: clamp(24rem, 62vw, 40rem);
+  }
+
   .events-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1103,6 +1129,10 @@ const submitJoinRequest = async () => {
 @media (max-width: 700px) {
   .home-page {
     gap: 2.5rem;
+  }
+
+  .story-block__image {
+    min-height: clamp(18rem, 72vw, 26rem);
   }
 
   .section-header {

@@ -5,6 +5,7 @@ import EventDetailPage from '../pages/EventDetailPage.vue'
 import GalleryPage from '../pages/GalleryPage.vue'
 import HeritagePage from '../pages/HeritagePage.vue'
 import ModelBeetlePage from '../pages/ModelBeetlePage.vue'
+import TermsAndRulesPage from '../pages/TermsAndRulesPage.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomePage },
@@ -12,7 +13,8 @@ const routes = [
   { path: '/events/:id', name: 'event-detail', component: EventDetailPage },
   { path: '/gallery', name: 'gallery', component: GalleryPage },
   { path: '/heritage', name: 'heritage', component: HeritagePage },
-  {path: '/beetle', name: 'beetle', component: ModelBeetlePage},
+  { path: '/terms-and-rules', alias: '/terms', name: 'terms-and-rules', component: TermsAndRulesPage },
+  { path: '/beetle', name: 'beetle', component: ModelBeetlePage },
 ]
 
 const router = createRouter({

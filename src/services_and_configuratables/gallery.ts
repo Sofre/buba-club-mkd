@@ -57,6 +57,43 @@ value
 .replace(/\s+/g, " ")
 .trim()
 
+const albumSortTime = (title: string): number | null => {
+  const yearFirstDate = title.match(/\b(19\d{2}|20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})\b/)
+  const dayFirstDate = title.match(/\b(\d{1,2})[-/.](\d{1,2})[-/.](19\d{2}|20\d{2})\b/)
+
+  if (yearFirstDate || dayFirstDate) {
+    const [, first, second, third] = (yearFirstDate ?? dayFirstDate)!
+    const year = Number(yearFirstDate ? first : third)
+    const month = Number(second)
+    const day = Number(yearFirstDate ? third : first)
+    const date = new Date(Date.UTC(year, month - 1, day))
+
+    if (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    ) {
+      return date.getTime()
+    }
+  }
+
+  const year = title.match(/\b(19\d{2}|20\d{2})\b/)
+  return year ? Date.UTC(Number(year[1]), 0, 1) : null
+}
+
+const compareAlbumsChronologically = (left: GalleryAlbum, right: GalleryAlbum) => {
+  const leftTime = albumSortTime(left.title)
+  const rightTime = albumSortTime(right.title)
+
+  if (leftTime === null && rightTime !== null) return 1
+  if (leftTime !== null && rightTime === null) return -1
+  if (leftTime !== null && rightTime !== null && leftTime !== rightTime) {
+    return leftTime - rightTime
+  }
+
+  return left.title.localeCompare(right.title, undefined, { numeric: true })
+}
+
 const CACHE_TTL_MS = 10 * 60 * 1000
 const memoryCache = new Map<string, { at: number; data: unknown }>()
 const inflight = new Map<string, Promise<unknown>>()
@@ -142,7 +179,7 @@ const cachedGetJson = async <T>(url: string, errorLabel: string): Promise<T> => 
   photos: [],
 
 
-  }))
+  })).sort(compareAlbumsChronologically)
   }
 
 /**

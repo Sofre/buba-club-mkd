@@ -22,7 +22,8 @@
         "home": "Home",
         "heritage": "Heritage",
         "events": "Events",
-        "gallery": "Gallery"
+        "gallery": "Gallery",
+        "termsRules": "Terms & Rules"
       },
       "footer": {
         "contact": "Contact",
@@ -114,12 +115,12 @@
         "cta": "Want to learn more? Visit our Heritage page to discover the history of Beetle Club Macedonia, our journey, memorable milestones, and the legacy we continue to build together.",
         "timeline": [
           {
-            "year": "2001",
+            "year": "2010",
             "title": "The beginning",
             "body": "Our story starts with the love for the air-cooled classic, the community around it and the rituals of the drive."
           },
           {
-            "year": "2016",
+            "year": "2021",
             "title": "Shared identity",
             "body": "The club began to grow through regular meetups, restoration stories and a shared passion for bringing old machines back to life."
           },
@@ -206,7 +207,8 @@
         "home": "Дома",
         "heritage": "Наследство",
         "events": "Настани",
-        "gallery": "Галерија"
+        "gallery": "Галерија",
+        "termsRules": "Правила"
       },
       "footer": {
         "contact": "Контакт",
@@ -298,12 +300,12 @@
         "cta": "Сакате да дознаете повеќе? Посетете ја нашата страница за наследство за да ги откриете историјата на Буба Клуб Македонија, нашето патување, запаметливите моменти и наследството кое продолжуваме да го градиме заедно.",
         "timeline": [
           {
-            "year": "2001",
+            "year": "2010",
             "title": "Почетокот",
             "body": "Нашата приказна започнува со љубовта кон воздушно ладениот класик, заедницата околу него и ритуалите на возењето."
           },
           {
-            "year": "2016",
+            "year": "2021",
             "title": "Заеднички идентитет",
             "body": "Клубот почна да расте преку редовни средби, приказни за реставрација и заедничка страст за враќање на старите машини во живот."
           },

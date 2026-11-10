@@ -19,7 +19,7 @@ export const heritagePageDataEng: HeritagePageData = {
 
   timeline: [
     {
-      year: '2001',
+      year: '2010',
       header: 'The Beginning of Beetle Club Macedonia',
       paragraphs: [
         'At the beginning of the new millennium, Volkswagen Beetle owners and enthusiasts in Macedonia were becoming increasingly connected through their shared passion for the iconic air-cooled car. What had previously been individual ownership and occasional meetings gradually developed into the idea of creating an organized community. Owners wanted a place where they could meet other enthusiasts, exchange experiences, help each other maintain and restore their cars, and most importantly, enjoy the Beetle together.',
@@ -28,7 +28,7 @@ export const heritagePageDataEng: HeritagePageData = {
     },
 
     {
-      year: '2002',
+      year: '2011',
       header: 'The First Birthday',
       paragraphs: [
         'In 2002, Beetle Club Macedonia marked its first year as a community. The first anniversary was an important milestone because it showed that the idea behind the club could grow beyond a small gathering of owners. The Beetle was becoming a reason for people to meet, travel, exchange stories, and build friendships. Every car brought its own history, whether it had belonged to a family for years, had been restored by its owner, or had recently found a new home in Macedonia.',
@@ -37,8 +37,8 @@ export const heritagePageDataEng: HeritagePageData = {
     },
 
     {
-      year: '2012',
-      header: '10 Years of Beetle Club Macedonia',
+      year: '2021',
+      header: '11 Years of Beetle Club Macedonia',
       paragraphs: [
         'Ten years after the club was formed, Beetle Club Macedonia reached its first major anniversary. A decade of meetings, drives, restorations, friendships, and shared experiences had transformed the club from a small group of enthusiasts into an established community with its own identity and traditions. During those years, Beetles from different generations and in different conditions became part of the club story, from carefully preserved original examples to cars that had been brought back to life through years of restoration work.',
         'The tenth anniversary represented much more than ten years of ownership and car gatherings. It demonstrated the lasting appeal of the Beetle and the strength of the community built around it. Members who had been there from the beginning could look back at how far the club had come, while newer enthusiasts could become part of a tradition that was already a decade old. The anniversary celebrated the people, the cars, the roads travelled together, and the countless moments that had turned a shared interest into a lasting community.',
@@ -46,7 +46,7 @@ export const heritagePageDataEng: HeritagePageData = {
     },
 
     {
-      year: '2017',
+      year: '2025',
       header: '15 Years of Heritage',
       paragraphs: [
         'In 2017, Beetle Club Macedonia celebrated 15 years since its formation. By this point, the club had become a recognizable part of the classic-car community in Macedonia, bringing together owners and admirers of the Volkswagen Beetle around events, gatherings, drives, and the preservation of automotive heritage. Fifteen years represented an entire generation of memories — cars that had been restored, friendships that had been formed, and members who had discovered their passion for the Beetle through the club.',
@@ -56,7 +56,7 @@ export const heritagePageDataEng: HeritagePageData = {
 
     {
       year: '2026',
-      header: 'A Living Heritage',
+      header: 'Legacy continues',
       paragraphs: [
         'Today, Beetle Club Macedonia continues the tradition that began more than two decades ago. The Beetle has changed from everyday transportation into a piece of living automotive heritage, but its ability to bring people together has remained remarkably strong. Club members continue to preserve, restore, maintain, and drive their cars, while gatherings and events provide opportunities to share experiences with both longtime enthusiasts and people discovering the Beetle for the first time.',
         'The club represents a bridge between generations. Older members carry memories and technical knowledge from years of ownership, while younger enthusiasts bring new energy and new ways of sharing the culture. Every event, road trip, photograph, restoration, and newly discovered Beetle adds something to the club history. What started with a group of people who simply wanted to share their passion has become a continuing heritage — one that lives on every time a Beetle starts its engine and heads out onto a Macedonian road.',
@@ -75,7 +75,7 @@ export const heritagePageDataMkd: HeritagePageData = {
 
   timeline: [
     {
-      year: '2001',
+      year: '2010',
       header: 'Почетокот на Буба Клуб Македонија',
       paragraphs: [
         'На почетокот на новиот милениум, сопствениците и ентузијастите на Фолксваген Буба во Македонија сè повеќе се поврзуваа преку заедничката страст кон иконскиот воздушно ладен автомобил. Она што дотогаш беше поединечна сопственост и повремени средби постепено се разви во идеја за создавање организирана заедница. Сопствениците сакаа место каде што ќе можат да запознаат други ентузијасти, да разменуваат искуства, да си помагаат при одржување и реставрација на автомобилите и, пред сè, да уживаат во Бубата заедно.',
@@ -84,7 +84,7 @@ export const heritagePageDataMkd: HeritagePageData = {
     },
 
     {
-      year: '2002',
+      year: '2011',
       header: 'Првиот роденден',
       paragraphs: [
         'Во 2002 година, Буба Клуб Македонија ја одбележа својата прва година како заедница. Првата годишнина беше важна пресвртница бидејќи покажа дека идејата зад клубот може да порасне надвор од мало дружење на сопственици. Бубата стануваше причина луѓето да се среќаваат, да патуваат, да разменуваат приказни и да градат пријателства. Секој автомобил носеше своја историја — без разлика дали со години им припаѓал на семејство, го реставрирал сопственикот или неодамна нашол нов дом во Македонија.',
@@ -93,8 +93,8 @@ export const heritagePageDataMkd: HeritagePageData = {
     },
 
     {
-      year: '2012',
-      header: '10 години Буба Клуб Македонија',
+      year: '2021',
+      header: '11 години Буба Клуб Македонија',
       paragraphs: [
         'Десет години по формирањето, Буба Клуб Македонија ја достигна својата прва голема годишнина. Една деценија средби, вожњи, реставрации, пријателства и заеднички искуства го претвори клубот од мала група ентузијасти во воспоставена заедница со свој идентитет и традиции. Во тие години, Буби од различни генерации и во различна состојба станаа дел од приказната на клубот — од внимателно зачувани оригинали до автомобили вратени во живот по години реставрација.',
         'Десетгодишнината претставуваше многу повеќе од десет години сопственост и дружења. Таа ја покажа трајната привлечност на Бубата и силата на заедницата изградена околу неа. Членовите кои биле тука од самиот почеток можеа да погледнат наназад колку далеку стигнал клубот, а новите ентузијасти можеа да станат дел од традиција стара веќе една деценија. Годишнината ги слави луѓето, автомобилите, заедно поминатите патишта и безбројните моменти што заедничкиот интерес го претворија во трајна заедница.',
@@ -102,7 +102,7 @@ export const heritagePageDataMkd: HeritagePageData = {
     },
 
     {
-      year: '2017',
+      year: '2025',
       header: '15 години наследство',
       paragraphs: [
         'Во 2017 година, Буба Клуб Македонија прослави 15 години од своето формирање. Дотогаш, клубот веќе беше препознатлив дел од заедницата на класични автомобили во Македонија, обединувајќи сопственици и обожаватели на Фолксваген Бубата околу настани, дружења, вожњи и зачувување на автомобилското наследство. Петнаесет години претставуваа цела генерација сеќавања — автомобили што биле реставрирани, пријателства што биле создадени и членови кои ја откриле својата љубов кон Бубата преку клубот.',
@@ -112,7 +112,7 @@ export const heritagePageDataMkd: HeritagePageData = {
 
     {
       year: '2026',
-      header: 'Живо наследство',
+      header: 'Традицијата продолжува',
       paragraphs: [
         'Денес, Буба Клуб Македонија ја продолжува традицијата започната пред повеќе од две децении. Бубата од секојдневен превоз се претвори во дел од живото автомобилско наследство, но нејзината способност да ги обединува луѓето остана неверојатно силна. Членовите на клубот продолжуваат да ги зачувуваат, реставрираат, одржуваат и возат своите автомобили, а дружењата и настаните даваат можност за споделување искуства и со долгогодишни ентузијасти и со луѓе кои ја откриваат Бубата за прв пат.',
         'Клубот претставува мост меѓу генерациите. Постарите членови носат сеќавања и техничко знаење од годините сопственост, додека помладите ентузијасти донесуваат нова енергија и нови начини за споделување на културата. Секој настан, патување, фотографија, реставрација и новооткриена Буба додава нешто кон историјата на клубот. Она што започна како група луѓе кои едноставно сакаа да ја споделат својата страст стана непрекинато наследство — кое живее секој пат кога некоја Буба ќе го запали моторот и ќе тргне по македонскиот пат.',

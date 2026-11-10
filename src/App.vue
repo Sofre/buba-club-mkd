@@ -27,6 +27,7 @@
           <router-link to="/heritage" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.heritage }}</router-link>
           <router-link to="/events" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.events }}</router-link>
           <router-link to="/gallery" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.gallery }}</router-link>
+          <router-link to="/terms-and-rules" exact-active-class="nav-link--active" active-class="nav-link--active"><span class="nav-led" aria-hidden="true"></span>{{ currentContent.app.nav.termsRules }}</router-link>
           <router-link to="/beetle" exact-active-class="nav-link--active" active-class="nav-link--active" aria-label="Beetle"><span class="nav-led" aria-hidden="true"></span></router-link>
         </nav>
 
@@ -105,7 +106,7 @@
           <p class="stamp-label">{{ footerLabels.contact }}</p>
           <ul class="stamp-list">
             <li>Beetle Club Macedonia</li>
-            <li>+389 75 404 907</li>
+            <li>+389 71 592 066</li>
           </ul>
         </section>
 
@@ -116,7 +117,7 @@
 
         <section class="stamp-module">
           <p class="stamp-label">{{ footerLabels.mail }}</p>
-          <a class="stamp-link" href="mailto:dukisofronievski@gmail.com">dukisofronievski@gmail.com</a>
+          <a class="stamp-link" href="mailto:bubaklubmakedonija@yahoo.com">bubaklubmakedonija@yahoo.com</a>
         </section>
 
         <section class="stamp-module">
@@ -126,6 +127,7 @@
             <router-link to="/heritage">{{ currentContent.app.nav.heritage }}</router-link>
             <router-link to="/events">{{ currentContent.app.nav.events }}</router-link>
             <router-link to="/gallery">{{ currentContent.app.nav.gallery }}</router-link>
+            <router-link to="/terms-and-rules">{{ currentContent.app.nav.termsRules }}</router-link>
           </nav>
         </section>
 
@@ -141,6 +143,17 @@
                 aria-label="Beetle Club Macedonia on Instagram (opens in a new tab)"
               >
                 Instagram
+              </a>
+            </li>
+            <li>
+              <a
+                class="stamp-link"
+                :href="socialProfiles.facebook"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Beetle Club Macedonia on Facebook (opens in a new tab)"
+              >
+                Facebook
               </a>
             </li>
           </ul>
@@ -161,7 +174,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import bubaLogo from './assets/icons/bubalogo.jpg'
 import { socialProfiles } from './services_and_configuratables/socials'
-import { events } from './services_and_configuratables/events'
+import { events, getLocalizedEvent } from './services_and_configuratables/events'
 import { currentLanguageCode, currentTranslation } from './services_and_configuratables/translations_state_change'
 
 import { homeReady } from './services_and_configuratables/app_ready'
@@ -170,7 +183,10 @@ const SPLASH_MIN_MS = 1200
 const SPLASH_MAX_MS = 5000
 
 const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-const nextEvent = computed(() => sortedEvents.find((event) => new Date(event.date).getTime() >= Date.now()))
+const nextEvent = computed(() => {
+  const event = sortedEvents.find((item) => new Date(item.date).getTime() >= Date.now())
+  return event ? getLocalizedEvent(event, currentLanguageCode.value) : undefined
+})
 const isInitialLoad = ref(true)
 const isRouteReady = ref(false)
 const showSplash = ref(true)
@@ -183,10 +199,10 @@ const currentContent = computed(() => currentTranslation.value)
 const eventBannerFields = computed(() =>
   currentLanguageCode.value === 'mkd'
     ? {
-        date: 'DATUM',
-        time: 'VREME',
-        city: 'GRAD',
-        title: 'NASTAN',
+        date: 'ДАТУМ',
+        time: 'ВРЕМЕ',
+        city: 'ГРАД',
+        title: 'НАСТАН',
       }
     : {
         date: 'DATE',
@@ -203,8 +219,8 @@ const eventBannerHint = computed(() =>
 const footerLabels = computed(() =>
   currentLanguageCode.value === 'mkd'
     ? {
-        contact: 'KONTAKT',
-        location: 'LOKACIJA',
+        contact: 'КОНТАКТ',
+        location: 'ЛОКАЦИЈА',
         mail: 'MAIL',
       }
     : {

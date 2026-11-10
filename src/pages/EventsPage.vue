@@ -29,16 +29,20 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { events } from '../services_and_configuratables/events'
-import { currentTranslation } from '../services_and_configuratables/translations_state_change'
+import { events, getLocalizedEvent } from '../services_and_configuratables/events'
+import { currentLanguageCode, currentTranslation } from '../services_and_configuratables/translations_state_change'
 
 const content = computed(() => currentTranslation.value)
-const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+const sortedEvents = computed(() =>
+  events
+    .map((event) => getLocalizedEvent(event, currentLanguageCode.value))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+)
 
-const upcomingEvents = computed(() => sortedEvents.filter((event) => new Date(event.date).getTime() >= Date.now()))
+const upcomingEvents = computed(() => sortedEvents.value.filter((event) => new Date(event.date).getTime() >= Date.now()))
 const nextEvent = computed(() => upcomingEvents.value[0])
 
-const formattedDate = (value: string) => new Date(value).toLocaleString('en', {
+const formattedDate = (value: string) => new Date(value).toLocaleString(currentLanguageCode.value === 'mkd' ? 'mk' : 'en', {
   dateStyle: 'full',
   timeStyle: 'short',
 })
