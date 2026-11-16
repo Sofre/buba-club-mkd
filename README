@@ -9,7 +9,9 @@ A full-stack web application developed for the Beetle Club North Macedonia.
 * **Frontend:** Vue 3.js + Vite
 * **Backend:** NestJS
 * **Object (Image) Storage:** Cloudy Object Storage
-* **Deployment:** Vercel
+* **Cloudfare AntiBot Setup
+* **Deployment:** Vercel( Backend) + cPanel( frontend) w GOHOST 
+* **SEO: Google Search Console + Indexing + Monitoring 
 
 ## Overview
 
@@ -59,4 +61,4 @@ A major goal of this approach is **cost optimization**. Instead of pulling large
 
 The architecture is intentionally minimal: **Vue 3 handles the user interface and gallery experience, NestJS provides the API and image-delivery layer, and Cloudy Object Storage handles the underlying image storage. Cloudy is also optimized on economic mode.**
 
-
+... DOCUMENTATION IS NOT DONE YET 
