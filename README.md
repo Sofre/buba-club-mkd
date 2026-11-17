@@ -7,11 +7,10 @@ A full-stack web application developed for the Beetle Club North Macedonia.
 ## Tech Stack
 
 * **Frontend:** Vue 3.js + Vite
-* **Backend:** NestJS
+* **Backend:** Next.js API
 * **Object (Image) Storage:** Cloudy Object Storage
-* **Cloudfare AntiBot Setup
-* **Deployment:** Vercel( Backend) + cPanel( frontend) w GOHOST 
-* **SEO: Google Search Console + Indexing + Monitoring 
+* **Backend deployment:** Vercel
+* **Frontend hosting:** GOHost through cPanel
 
 ## Overview
 
@@ -39,7 +38,7 @@ This approach helps reduce initial page load times, bandwidth usage, and unneces
 
 ## Architecture
 
-The application follows a simple and lightweight architecture built around a **Vue 3 frontend** and a **basic NestJS backend**.
+The application follows a simple and lightweight architecture built around a **Vue 3 frontend** and a **Next.js API backend**.
 
 The frontend is primarily responsible for presenting the beetle gallery and interacting with the gallery service. The application avoids unnecessary complexity and keeps the client-side architecture focused on displaying and browsing the available content.
 
@@ -59,6 +58,16 @@ This architecture allows the application to keep the frontend simple while movin
 
 A major goal of this approach is **cost optimization**. Instead of pulling large numbers of full-resolution images directly from object storage, the backend controls how and when images are requested and delivered. This helps reduce **bandwidth consumption, unnecessary storage transactions, API operations, and associated object-storage costs**, while still providing a responsive gallery experience.
 
-The architecture is intentionally minimal: **Vue 3 handles the user interface and gallery experience, NestJS provides the API and image-delivery layer, and Cloudy Object Storage handles the underlying image storage. Cloudy is also optimized on economic mode.**
+The architecture is intentionally minimal: **Vue 3 handles the user interface and gallery experience, the Next.js API provides the image-delivery layer, and Cloudy Object Storage handles the underlying image storage. Cloudy is configured in economic mode.**
 
-... DOCUMENTATION IS NOT DONE YET 
+## Deployment & Hosting
+
+The **backend API is deployed on Vercel**. I chose Vercel because its free plan is suitable for the project's current needs, and the API's data transfer is very low. The image service I built controls image requests and applies optimization, while Cloudy Object Storage provides a second layer of optimization through resized image variants and on-demand delivery. Together, these measures help limit unnecessary data transfer and storage requests.
+
+The **frontend is hosted by GOHost**, with the domain configured through **cPanel**.
+
+## SEO & Google Indexing
+
+I use **Google Search Console** for SEO monitoring and to track how the site is indexed by Google. Indexing is currently being monitored. While Google updates its results, it may occasionally show an outdated URL or redirect; use the current official site URL when this happens.
+
+
